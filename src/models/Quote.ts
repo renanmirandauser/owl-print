@@ -7,13 +7,13 @@ const QuoteItemSchema = new Schema(
     name: { type: String, required: true },
     quantity: { type: Number, required: true, min: 1 },
     unitPrice: { type: Number, required: true, min: 0 },
-    get subtotal() {
-      return (this as { quantity: number; unitPrice: number }).quantity *
-        (this as { quantity: number; unitPrice: number }).unitPrice;
-    },
   },
-  { _id: false, toJSON: { getters: true } }
+  { _id: false, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+QuoteItemSchema.virtual("subtotal").get(function (this: { quantity: number; unitPrice: number }) {
+  return this.quantity * this.unitPrice;
+});
 
 const QuoteSchema = new Schema(
   {
