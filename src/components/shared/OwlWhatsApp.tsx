@@ -45,27 +45,25 @@ export function OwlWhatsApp() {
         )}
       </AnimatePresence>
 
-      <motion.a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={handleClick}
-        aria-label="Olá tudo bem? Vim através site da OWL PRINT e gostaria de um orçamento."
-        whileHover={{ scale: 1.06 }}
-        whileTap={{ scale: 0.95 }}
-        className="grid h-16 w-16 place-items-center rounded-full bg-leather shadow-premium ring-2 ring-champagne animate-float"
-      >
-        {/* Placeholder do mascote — troque pela arte da coruja em /public/owl-whatsapp.png */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/public/owlwhatsapp.png"
-          alt="Coruja OWL PRINT"
-          className="h-12 w-12 object-contain"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).style.display = "none";
-          }}
-        />
-      </motion.a>
+            <motion.a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={handleClick}
+          aria-label="Falar com a OWL PRINT no WhatsApp"
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.95 }}
+          className="grid h-16 w-16 place-items-center rounded-full bg-leather shadow-premium ring-2 ring-champagne animate-float"
+        >
+          <img
+            src="/owlwhatsapp.png"
+            alt="OWL PRINT"
+            className="h-12 w-12 object-contain"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = "none";
+            }}
+          />
+        </motion.a>
     </div>
   );
 }
