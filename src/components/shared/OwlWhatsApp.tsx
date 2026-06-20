@@ -50,7 +50,7 @@ export function OwlWhatsApp() {
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleClick}
-        aria-label="Falar no WhatsApp com a OWL PRINT"
+        aria-label="Olá tudo bem? Vim através site da OWL PRINT e gostaria de um orçamento."
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.95 }}
         className="grid h-16 w-16 place-items-center rounded-full bg-leather shadow-premium ring-2 ring-champagne animate-float"
@@ -58,7 +58,7 @@ export function OwlWhatsApp() {
         {/* Placeholder do mascote — troque pela arte da coruja em /public/owl-whatsapp.png */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/public/owllogo.png"
+          src="/public/owlwhatsapp.png"
           alt="Coruja OWL PRINT"
           className="h-12 w-12 object-contain"
           onError={(e) => {
