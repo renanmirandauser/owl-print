@@ -53,12 +53,12 @@ export function OwlWhatsApp() {
           aria-label="Falar com a OWL PRINT no WhatsApp"
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.95 }}
-          className="grid h-16 w-16 place-items-center rounded-full bg-leather shadow-premium ring-2 ring-champagne animate-float"
+          className="grid h-16 w-16 place-items-center rounded-full bg-white shadow-premium ring-2 ring-champagne animate-float"
         >
           <img
             src="/public/owlwhatsapp.png"
             alt="OWL PRINT"
-            className="h-12 w-12 object-contain"
+            className="h-14 w-14 object-contain"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).style.display = "none";
             }}
