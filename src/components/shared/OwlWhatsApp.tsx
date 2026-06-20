@@ -58,7 +58,7 @@ export function OwlWhatsApp() {
           <img
             src="/public/owlwhatsapp.png"
             alt="OWL PRINT"
-            className="h-14 w-14 object-contain"
+            className="h-12 w-12 object-contain"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).style.display = "none";
             }}
