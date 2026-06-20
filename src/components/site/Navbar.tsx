@@ -22,7 +22,7 @@ export function Navbar() {
       <nav className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center">
          <Image
-           src="/owllogo.png" 
+           src="/public/owllogo.png 
            alt="OWL PRINT"
            width={220}
            height={70}
