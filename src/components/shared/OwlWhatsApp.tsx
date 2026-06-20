@@ -56,7 +56,7 @@ export function OwlWhatsApp() {
           className="grid h-16 w-16 place-items-center rounded-full bg-white shadow-premium ring-2 ring-champagne animate-float"
         >
           <img
-            src="/public/owlwhatsapp.png"
+            src="/owlwhatsapp.png"
             alt="OWL PRINT"
             className="h-12 w-12 object-contain"
             onError={(e) => {
