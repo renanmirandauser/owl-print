@@ -24,8 +24,6 @@ export function Navbar() {
          <Image
            src="/public/owllogo.png 
            alt="OWL PRINT"
-           width={220}
-           height={70}
            priority
          />
         </Link>
