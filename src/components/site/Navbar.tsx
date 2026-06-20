@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import Image from "next/image";
 
 const LINKS = [
   { href: "/", label: "Início" },
@@ -19,8 +20,14 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-champagne/20 bg-leather/95 backdrop-blur">
       <nav className="container flex h-16 items-center justify-between">
-        <Link href="/" className="font-display text-xl font-bold text-champagne">
-          OWL PRINT
+        <Link href="/" className="flex items-center">
+         <Image
+           src="/public/owllogo.png"
+           alt="OWL PRINT"
+           width={220}
+           height={70}
+           priority
+         />
         </Link>
 
         <ul className="hidden items-center gap-8 md:flex">

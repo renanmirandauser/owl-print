@@ -58,7 +58,7 @@ export function OwlWhatsApp() {
         {/* Placeholder do mascote — troque pela arte da coruja em /public/owl-whatsapp.png */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/owl-whatsapp.png"
+          src="/public/owllogo.png"
           alt="Coruja OWL PRINT"
           className="h-12 w-12 object-contain"
           onError={(e) => {
