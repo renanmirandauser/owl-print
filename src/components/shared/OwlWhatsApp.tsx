@@ -65,7 +65,6 @@ export function OwlWhatsApp() {
             (e.currentTarget as HTMLImageElement).style.display = "none";
           }}
         />
-        <span className="absolute text-2xl">🦉</span>
       </motion.a>
     </div>
   );
