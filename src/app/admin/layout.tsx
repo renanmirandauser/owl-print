@@ -43,6 +43,28 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(href + "/");
 }
 
+/* Marca: coruja + nome escrito com a fonte (fica nítido em qualquer tamanho) */
+function Brand({ onNavigate }: { onNavigate?: () => void }) {
+  return (
+    <Link href="/admin" onClick={onNavigate} className="mb-6 flex items-center gap-2.5 px-1">
+      <Image
+        src="/owl-icon.png"
+        alt="OWL PRINT"
+        width={52}
+        height={52}
+        priority
+        className="h-11 w-auto"
+      />
+      <span className="leading-tight">
+        <span className="block font-display text-lg font-bold text-leather">OWL PRINT</span>
+        <span className="block text-[10px] font-semibold uppercase tracking-wider text-champagne">
+          Cardápios
+        </span>
+      </span>
+    </Link>
+  );
+}
+
 function NavContent({
   pathname,
   onNavigate,
@@ -52,15 +74,7 @@ function NavContent({
 }) {
   return (
     <>
-      <Link href="/admin" onClick={onNavigate} className="mb-6 flex items-center px-2">
-        <Image
-          src="/owllogo.png"
-          alt="OWL PRINT"
-          width={140}
-          height={44}
-          className="h-9 w-auto"
-        />
-      </Link>
+      <Brand onNavigate={onNavigate} />
 
       <nav className="flex-1 space-y-6">
         {GROUPS.map((g) => (
@@ -119,15 +133,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="min-h-screen bg-cream">
       {/* Barra superior (apenas mobile) */}
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-leather/10 bg-white px-4 lg:hidden print:hidden">
-        <Link href="/admin" className="flex items-center">
+        <Link href="/admin" className="flex items-center gap-2">
           <Image
-            src="/owllogo.png"
+            src="/owl-icon.png"
             alt="OWL PRINT"
-            width={250}
-            height={75}
-            priority
-            className="h-20 w-auto"
+            width={36}
+            height={36}
+            className="h-8 w-auto"
           />
+          <span className="font-display text-base font-bold text-leather">OWL PRINT</span>
         </Link>
         <button onClick={() => setOpen(true)} aria-label="Abrir menu" className="text-ink">
           <Menu />
