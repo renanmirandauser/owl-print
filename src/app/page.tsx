@@ -26,7 +26,7 @@ const DIFFERENTIALS = [
   { t: "Personalização exclusiva", d: "Cada peça com a identidade única do seu negócio." },
   { t: "Materiais premium", d: "Couro selecionado e acabamentos sofisticados." },
   { t: "Design sofisticado", d: "Projetos que impressionam à primeira vista." },
-  { t: "Entrega nacional", d: "Atendemos restaurantes e bares em todo o Brasil." },
+  { t: "Entrega nacional", d: "Atendemos restaurantes, bares hotéis, motéis e pubs em todo o Brasil." },
 ];
 
 export default function HomePage() {
