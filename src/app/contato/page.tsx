@@ -5,7 +5,7 @@ import { ContactForm } from "@/components/site/ContactForm";
 export const metadata: Metadata = {
   title: "Contato",
   description:
-    "Fale com a OWL PRINT e solicite seu orçamento de cardápios e acessórios de couro personalizados.",
+    "Fale com a OWL PRINT e solicite seu orçamento.",
 };
 
 function Info({ icon, label, value }: { icon: string; label: string; value: string }) {
@@ -50,7 +50,7 @@ export default function ContatoPage() {
       </div>
 
       <footer className="bg-ink py-8 text-center text-sm text-cream/50">
-        © {new Date().getFullYear()} OWL PRINT — Cardápios Personalizados.
+        © {new Date().getFullYear()} OWL PRINT — Cardápios Personalizados. Todos os direitos reservados.
       </footer>
     </main>
   );
