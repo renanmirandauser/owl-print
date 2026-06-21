@@ -51,12 +51,11 @@ export default function HomePage() {
       <section className="container py-20">
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-champagne">
-            Nosso catálogo
+            Catálogo
           </p>
           <h2 className="mt-2 font-display text-4xl font-bold text-leather">Nossos Produtos</h2>
           <p className="mx-auto mt-3 max-w-xl text-ink/60">
-            Soluções completas e personalizadas para elevar a experiência do seu cliente —
-            do cardápio aos detalhes da mesa.
+            Soluções completas e personalizadas para elevar a experiência do seu cliente.
           </p>
         </div>
 
