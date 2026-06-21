@@ -45,7 +45,7 @@ export default async function FinancialReportPage({
 
         {/* Resumo mensal */}
         <h2 className="mt-8 font-display text-lg text-leather">Demonstrativo Mensal</h2>
-        <table className="mt-3 w-full text-sm">
+        <div className="mt-3 overflow-x-auto"><table className="w-full min-w-[640px] text-sm">
           <thead>
             <tr className="border-b border-leather/20 text-left text-xs uppercase tracking-wider text-leather/50">
               <th className="py-2">Mês</th>
@@ -64,7 +64,7 @@ export default async function FinancialReportPage({
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
 
         <footer className="mt-12 border-t border-leather/10 pt-4 text-center text-xs text-leather/40">
           OWL PRINT — Cardápios Personalizados • {entries.length} lançamentos no ano de {year}

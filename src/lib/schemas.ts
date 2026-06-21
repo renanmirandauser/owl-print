@@ -25,16 +25,22 @@ export const clientSchema = z.object({
   source: z.string().optional(),
 });
 
-/* Lead vindo do site (mesma forma do cliente) */
+/* Lead vindo do site (público) — endurecido: trim + limites de tamanho */
 export const leadSchema = z.object({
-  name: z.string().min(2, "Informe o nome"),
-  company: z.string().optional(),
-  phone: z.string().optional(),
-  whatsapp: z.string().optional(),
-  instagram: z.string().optional(),
-  email: z.string().email("E-mail inválido").optional().or(z.literal("")),
-  notes: z.string().optional(),
-  source: z.string().optional(),
+  name: z.string().trim().min(2, "Informe o nome").max(120, "Nome muito longo"),
+  company: z.string().trim().max(160).optional(),
+  phone: z.string().trim().max(40).optional(),
+  whatsapp: z.string().trim().max(40).optional(),
+  instagram: z.string().trim().max(80).optional(),
+  email: z
+    .string()
+    .trim()
+    .email("E-mail inválido")
+    .max(160)
+    .optional()
+    .or(z.literal("")),
+  notes: z.string().trim().max(3000, "Mensagem muito longa").optional(),
+  source: z.string().trim().max(40).optional(),
 });
 
 /* Financeiro — lançamento */

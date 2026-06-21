@@ -16,6 +16,7 @@ export function ContactForm() {
     email: "",
     segment: "",
     message: "",
+    website: "", // honeypot anti-spam (não preencher)
   });
 
   const upd =
@@ -42,13 +43,14 @@ export function ContactForm() {
           email: form.email,
           notes,
           source: "site",
+          website: form.website, // honeypot
         }),
       });
       const data = await res.json();
       if (res.ok && data.ok) {
         setStatus("ok");
         track("contact_submit", { source: "site" });
-        setForm({ name: "", company: "", phone: "", email: "", segment: "", message: "" });
+        setForm({ name: "", company: "", phone: "", email: "", segment: "", message: "", website: "" });
       } else {
         setStatus("error");
       }
@@ -58,34 +60,46 @@ export function ContactForm() {
   }
 
   const field =
-    "w-full rounded-lg border border-premium/20 bg-white px-3 py-2 text-leather outline-none focus:border-champagne focus:ring-2 focus:ring-champagne/30";
+    "w-full rounded-lg border border-leather/15 bg-white px-3 py-2 text-ink outline-none focus:border-champagne focus:ring-2 focus:ring-champagne/30";
 
   return (
-    <div className="rounded-xl border border-premium/15 bg-white p-6 shadow-sm">
-      <h2 className="font-display text-2xl text-leather">Solicite seu orçamento</h2>
-      <p className="mt-1 text-sm text-leather/60">
+    <div className="rounded-xl border border-leather/10 bg-white p-6 shadow-soft">
+      <h2 className="font-display text-2xl font-semibold text-leather">Solicite seu orçamento</h2>
+      <p className="mt-1 text-sm text-ink/60">
         Responda em poucos campos — nossa equipe retorna rapidinho.
       </p>
 
+      {/* honeypot: invisível para humanos, capturado por bots */}
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        value={form.website}
+        onChange={upd("website")}
+        className="hidden"
+      />
+
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-xs text-leather/60">Nome *</label>
-          <input className={field} value={form.name} onChange={upd("name")} />
+          <label className="mb-1 block text-xs text-ink/60">Nome *</label>
+          <input className={field} maxLength={120} value={form.name} onChange={upd("name")} />
         </div>
         <div>
-          <label className="mb-1 block text-xs text-leather/60">Empresa</label>
-          <input className={field} value={form.company} onChange={upd("company")} />
+          <label className="mb-1 block text-xs text-ink/60">Empresa</label>
+          <input className={field} maxLength={160} value={form.company} onChange={upd("company")} />
         </div>
         <div>
-          <label className="mb-1 block text-xs text-leather/60">WhatsApp</label>
-          <input className={field} value={form.phone} onChange={upd("phone")} />
+          <label className="mb-1 block text-xs text-ink/60">WhatsApp</label>
+          <input className={field} maxLength={40} value={form.phone} onChange={upd("phone")} />
         </div>
         <div>
-          <label className="mb-1 block text-xs text-leather/60">E-mail</label>
-          <input className={field} value={form.email} onChange={upd("email")} />
+          <label className="mb-1 block text-xs text-ink/60">E-mail</label>
+          <input className={field} maxLength={160} value={form.email} onChange={upd("email")} />
         </div>
         <div className="sm:col-span-2">
-          <label className="mb-1 block text-xs text-leather/60">Segmento</label>
+          <label className="mb-1 block text-xs text-ink/60">Segmento</label>
           <select className={field} value={form.segment} onChange={upd("segment")}>
             <option value="">Selecione...</option>
             {SEGMENTS.map((s) => (
@@ -96,9 +110,10 @@ export function ContactForm() {
           </select>
         </div>
         <div className="sm:col-span-2">
-          <label className="mb-1 block text-xs text-leather/60">Mensagem</label>
+          <label className="mb-1 block text-xs text-ink/60">Mensagem</label>
           <textarea
             rows={4}
+            maxLength={3000}
             className={field}
             value={form.message}
             onChange={upd("message")}
@@ -116,7 +131,7 @@ export function ContactForm() {
           {status === "sending" ? "Enviando..." : "Enviar mensagem"}
         </button>
         {status === "ok" && (
-          <span className="text-sm text-green-700">Recebido! Entraremos em contato. ✓</span>
+          <span className="text-sm text-emerald-700">Recebido! Entraremos em contato. ✓</span>
         )}
         {status === "error" && (
           <span className="text-sm text-burgundy">

@@ -39,7 +39,7 @@ export default async function OrderDetailPage({
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {/* Itens */}
         <div className="overflow-hidden rounded-xl border border-premium/10 bg-white">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-sm">
             <thead className="bg-cream/60 text-left text-xs uppercase tracking-wider text-leather/50">
               <tr>
                 <th className="px-4 py-3">Produto</th>
@@ -62,7 +62,7 @@ export default async function OrderDetailPage({
                 </td>
               </tr>
             </tfoot>
-          </table>
+          </table></div>
           {o.quoteId && (
             <Link
               href={`/admin/orcamentos/${o.quoteId}`}

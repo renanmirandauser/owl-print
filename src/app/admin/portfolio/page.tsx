@@ -23,7 +23,7 @@ export default async function AdminPortfolioPage() {
             Nenhum case. <Link href="/admin/portfolio/novo" className="text-premium underline">Cadastrar o primeiro</Link>.
           </div>
         ) : (
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-sm">
             <thead className="bg-cream/60 text-left text-xs uppercase tracking-wider text-leather/50">
               <tr><th className="px-4 py-3">Case</th><th className="px-4 py-3">Cliente</th><th className="px-4 py-3">Segmento</th><th className="px-4 py-3 text-right">Ações</th></tr>
             </thead>
@@ -49,7 +49,7 @@ export default async function AdminPortfolioPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         )}
       </div>
     </div>
