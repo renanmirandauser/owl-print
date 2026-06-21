@@ -24,6 +24,9 @@ export function Navbar() {
         <Link href="/" className="flex items-center" aria-label="OWL PRINT — Início">
           <Image
             src="/owllogo.png"
+            alt="OWL PRINT — Cardápios Personalizados"
+            width={150}
+            height={48}
             priority
             className="h-9 w-auto md:h-11"
           />
