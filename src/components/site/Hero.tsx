@@ -53,7 +53,7 @@ export function Hero() {
         >
           <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-champagne/20" />
           <Image
-            src="/mascote owl print.png"
+            src="/mascote-owl-print.png"
             alt="Mascote OWL PRINT"
             width={360}
             height={444}
