@@ -6,6 +6,7 @@ import { dbConnect } from "@/lib/mongodb";
 import { Quote } from "@/models/Quote";
 import { QUOTE_STATUS, type QuoteStatus } from "@/types";
 import { quoteSchema } from "@/lib/schemas";
+import { sendMail } from "@/lib/email";
 
 export type QuoteInput = z.infer<typeof quoteSchema>;
 
@@ -197,7 +198,7 @@ export async function deleteQuote(id: string): Promise<ActionResult> {
   }
 }
 
-/* ─── Envio por e-mail (Resend REST, sem SDK) ───────────── */
+/* ─── Envio por e-mail (SMTP — HostGator) ───────────────── */
 
 export async function sendQuoteByEmail(id: string, to?: string): Promise<ActionResult> {
   try {
@@ -207,8 +208,6 @@ export async function sendQuoteByEmail(id: string, to?: string): Promise<ActionR
     const recipient = to || q.clientEmail;
     if (!recipient) return { ok: false, error: "Cliente sem e-mail cadastrado." };
 
-    const apiKey = process.env.RESEND_API_KEY;
-    const from = process.env.EMAIL_FROM ?? "OWL PRINT <orcamentos@owlprint.com.br>";
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
     const link = `${appUrl}/orcamentos/${id}/imprimir`;
 
@@ -220,16 +219,12 @@ export async function sendQuoteByEmail(id: string, to?: string): Promise<ActionR
         <p><a href="${link}" style="color:#C9A876">Visualizar / baixar PDF</a></p>
       </div>`;
 
-    if (apiKey) {
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ from, to: recipient, subject: `Orçamento ${q.code} — OWL PRINT`, html }),
-      });
-      if (!res.ok) return { ok: false, error: "Falha no provedor de e-mail." };
-    } else {
-      console.warn("[email] RESEND_API_KEY ausente — envio simulado para", recipient);
-    }
+    const sent = await sendMail({
+      to: recipient,
+      subject: `Orçamento ${q.code} — OWL PRINT`,
+      html,
+    });
+    if (!sent.ok) return { ok: false, error: sent.error };
 
     await Quote.findByIdAndUpdate(id, { status: "sent" });
     revalidatePath(`/admin/orcamentos/${id}`);
