@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #f0ebe3;
-  --foreground: #1a1a1a;
+  --background: #f7f5ef;
+  --foreground: #12273f;
 }
 
 @layer base {
@@ -15,21 +15,37 @@
     @apply font-display tracking-tight;
   }
   ::selection {
-    @apply bg-champagne/40 text-leather;
+    @apply bg-champagne/30 text-leather;
   }
 }
 
 @layer components {
-  /* botão dourado da marca */
+  /* botão dourado da marca (texto azul-marinho) */
   .btn-gold {
-    @apply inline-flex items-center justify-center gap-2 rounded-md bg-champagne px-6 py-3
-           font-medium text-leather transition-all duration-300
-           hover:bg-[#b8965f] hover:shadow-premium focus-visible:outline-none
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-champagne px-6 py-3
+           font-semibold text-ink transition-all duration-300
+           hover:bg-[#a8863f] hover:shadow-soft focus-visible:outline-none
            focus-visible:ring-2 focus-visible:ring-champagne focus-visible:ring-offset-2;
   }
+  /* botão secundário (contorno azul-marinho, para fundos claros) */
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 rounded-md border border-champagne/60
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-leather/25
+           px-6 py-3 font-medium text-leather transition-colors duration-300 hover:bg-leather/5;
+  }
+  /* botão secundário para fundos escuros (azul) */
+  .btn-outline-light {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-champagne/60
            px-6 py-3 font-medium text-cream transition-colors duration-300 hover:bg-champagne/10;
+  }
+  /* cartão padrão claro */
+  .card {
+    @apply rounded-xl border border-leather/10 bg-white shadow-soft;
+  }
+}
+
+@layer utilities {
+  .shadow-soft {
+    box-shadow: 0 8px 24px rgba(17,24,39,0.06);
   }
 }
 

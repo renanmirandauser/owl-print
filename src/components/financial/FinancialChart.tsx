@@ -16,15 +16,17 @@ import { BRL } from "@/lib/utils";
 
 export function FinancialChart({ data }: { data: MonthlyPoint[] }) {
   return (
-    <div className="rounded-xl border border-premium/10 bg-white p-5">
-      <h2 className="mb-4 font-display text-lg text-leather">Receita × Despesa × Lucro</h2>
+    <div className="rounded-xl border border-leather/10 bg-white p-5 shadow-soft">
+      <h2 className="mb-4 font-display text-lg font-semibold text-leather">
+        Receita × Despesa × Lucro
+      </h2>
       <div className="h-72 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={data} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e3dccf" vertical={false} />
-            <XAxis dataKey="label" tick={{ fontSize: 12, fill: "#5C3D2E" }} axisLine={false} tickLine={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e7e2d8" vertical={false} />
+            <XAxis dataKey="label" tick={{ fontSize: 12, fill: "#15395B" }} axisLine={false} tickLine={false} />
             <YAxis
-              tick={{ fontSize: 11, fill: "#8a7d72" }}
+              tick={{ fontSize: 11, fill: "#7c8794" }}
               axisLine={false}
               tickLine={false}
               tickFormatter={(v) => (v >= 1000 ? `${v / 1000}k` : `${v}`)}
@@ -33,14 +35,14 @@ export function FinancialChart({ data }: { data: MonthlyPoint[] }) {
               formatter={(v: number) => BRL.format(v)}
               contentStyle={{
                 borderRadius: 8,
-                border: "1px solid #e3dccf",
+                border: "1px solid #e7e2d8",
                 fontSize: 12,
               }}
             />
             <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Bar dataKey="revenue" name="Receita" fill="#C9A876" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="expense" name="Despesa" fill="#7A1F1F" radius={[4, 4, 0, 0]} />
-            <Line dataKey="profit" name="Lucro" stroke="#3D2B1F" strokeWidth={2} dot={{ r: 3 }} />
+            <Bar dataKey="revenue" name="Receita" fill="#BF9B4F" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="expense" name="Despesa" fill="#B23A3A" radius={[4, 4, 0, 0]} />
+            <Line dataKey="profit" name="Lucro" stroke="#15395B" strokeWidth={2} dot={{ r: 3 }} />
           </ComposedChart>
         </ResponsiveContainer>
       </div>

@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
 import Image from "next/image";
+import { Menu, X } from "lucide-react";
 
 const LINKS = [
   { href: "/", label: "Início" },
   { href: "/produtos", label: "Produtos" },
+  { href: "/loja", label: "Loja" },
   { href: "/como-funciona", label: "Como Funciona" },
   { href: "/portfolio", label: "Portfólio" },
   { href: "/sobre", label: "Sobre Nós" },
@@ -18,24 +19,25 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-champagne/20 bg-leather/95 backdrop-blur">
-      <nav className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center">
-         <Image
-           src="/public/owllogo.png 
-           alt="OWL PRINT"
-           width={120}
-           height={30}
-           priority
-         />
+    <header className="sticky top-0 z-40 border-b border-leather/10 bg-cream/90 backdrop-blur supports-[backdrop-filter]:bg-cream/80">
+      <nav className="container flex h-16 items-center justify-between md:h-20">
+        <Link href="/" className="flex items-center" aria-label="OWL PRINT — Início">
+          <Image
+            src="/owllogo.png"
+            alt="OWL PRINT — Cardápios Personalizados"
+            width={150}
+            height={48}
+            priority
+            className="h-9 w-auto md:h-11"
+          />
         </Link>
 
-        <ul className="hidden items-center gap-8 md:flex">
+        <ul className="hidden items-center gap-7 lg:flex">
           {LINKS.map((l) => (
             <li key={l.href}>
               <Link
                 href={l.href}
-                className="text-sm text-cream/80 transition-colors hover:text-champagne"
+                className="text-sm font-medium text-ink/70 transition-colors hover:text-champagne"
               >
                 {l.label}
               </Link>
@@ -43,34 +45,39 @@ export function Navbar() {
           ))}
         </ul>
 
-        <Link href="/contato" className="hidden btn-gold !py-2 !px-4 md:inline-flex">
+        <Link href="/contato" className="hidden btn-gold !py-2 !px-4 text-sm lg:inline-flex">
           Solicitar Orçamento
         </Link>
 
         <button
-          className="text-cream md:hidden"
+          className="text-ink lg:hidden"
           onClick={() => setOpen((v) => !v)}
-          aria-label="Abrir menu"
+          aria-label={open ? "Fechar menu" : "Abrir menu"}
+          aria-expanded={open}
         >
           {open ? <X /> : <Menu />}
         </button>
       </nav>
 
       {open && (
-        <div className="border-t border-champagne/20 bg-leather md:hidden">
+        <div className="border-t border-leather/10 bg-cream lg:hidden">
           <ul className="container flex flex-col gap-1 py-4">
             {LINKS.map((l) => (
               <li key={l.href}>
                 <Link
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="block py-2 text-cream/80 hover:text-champagne"
+                  className="block rounded-md px-2 py-2.5 text-ink/80 transition-colors hover:bg-leather/5 hover:text-champagne"
                 >
                   {l.label}
                 </Link>
               </li>
             ))}
-            <Link href="/contato" className="btn-gold mt-2 !py-2">
+            <Link
+              href="/contato"
+              onClick={() => setOpen(false)}
+              className="btn-gold mt-2 !py-2.5"
+            >
               Solicitar Orçamento
             </Link>
           </ul>

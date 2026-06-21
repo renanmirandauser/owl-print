@@ -1,39 +1,47 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-leather text-cream">
-      {/* textura/gradiente premium */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-leather via-premium to-ink opacity-90" />
-      <div className="pointer-events-none absolute -right-20 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full bg-champagne/10 blur-3xl" />
+    <section className="relative overflow-hidden bg-cream">
+      {/* realces suaves em dourado/azul */}
+      <div className="pointer-events-none absolute -right-24 -top-24 h-[420px] w-[420px] rounded-full bg-champagne/10 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-32 -left-24 h-[380px] w-[380px] rounded-full bg-leather/5 blur-3xl" />
 
-      <div className="container relative grid items-center gap-12 py-24 md:grid-cols-2 md:py-32">
+      <div className="container relative grid items-center gap-12 py-20 md:grid-cols-2 md:py-28">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
         >
-          <p className="mb-4 text-sm uppercase tracking-[0.3em] text-champagne">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.3em] text-champagne">
             Cardápios Personalizados • Est. 2024
           </p>
-          <h1 className="font-display text-5xl leading-[1.05] md:text-6xl">
+          <h1 className="font-display text-5xl font-bold leading-[1.05] text-leather md:text-6xl">
             Cardápios que<br />
             <span className="text-champagne">Contam Histórias</span>
           </h1>
-          <p className="mt-6 max-w-md text-lg text-cream/80">
-            Soluções personalizadas para restaurantes, bares, hotéis e motéis.
-            Couro, acabamento e excelência em cada detalhe.
+          <p className="mt-6 max-w-md text-lg text-ink/70">
+            Cardápios, cartas de vinho e acessórios em couro feitos sob medida para
+            restaurantes, bares, hotéis e motéis. Design exclusivo e acabamento premium
+            que valorizam a sua marca.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Link href="/contato" className="btn-gold">
               Solicitar Orçamento
             </Link>
-            <Link href="/produtos" className="btn-outline">
-              Ver Catálogo
+            <Link href="/loja" className="btn-outline">
+              Montar Orçamento na Loja
             </Link>
+          </div>
+
+          <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm text-ink/60">
+            <span>✓ Personalização exclusiva</span>
+            <span>✓ Acabamento premium</span>
+            <span>✓ Entrega para todo o Brasil</span>
           </div>
         </motion.div>
 
@@ -41,10 +49,17 @@ export function Hero() {
           initial={{ opacity: 0, scale: 0.92 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.15 }}
-          className="relative mx-auto aspect-[3/4] w-full max-w-sm rounded-2xl bg-gradient-to-b from-premium to-ink shadow-premium ring-1 ring-champagne/30"
+          className="relative mx-auto flex aspect-square w-full max-w-md items-center justify-center rounded-3xl border border-leather/10 bg-white shadow-premium"
         >
-          {/* Substitua pela arte do mascote segurando o cardápio de couro */}
-          <div className="flex h-full items-center justify-center text-7xl">🦉</div>
+          <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-champagne/20" />
+          <Image
+            src="/owl-icon.png"
+            alt="Mascote OWL PRINT"
+            width={360}
+            height={444}
+            priority
+            className="h-[78%] w-auto drop-shadow-xl"
+          />
         </motion.div>
       </div>
     </section>

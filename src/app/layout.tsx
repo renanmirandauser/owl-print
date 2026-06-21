@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@/components/analytics/Analytics";
 import { OwlWhatsApp } from "@/components/shared/OwlWhatsApp";
 
-const playfair = Playfair_Display({
+const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-playfair",
+  weight: ["500", "600", "700"],
+  variable: "--font-display",
   display: "swap",
 });
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-body", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | OWL PRINT",
   },
   description:
-    "Cardápios, cartas de vinho e acessórios de couro personalizados para restaurantes, bares, hotéis e motéis.",
+    "Cardápios, cartas de vinho e acessórios em couro personalizados para restaurantes, bares, hotéis e motéis. Design exclusivo e acabamento premium.",
   openGraph: {
     type: "website",
     locale: "pt_BR",
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${playfair.variable} ${inter.variable}`}>
+    <html lang="pt-BR" className={`${poppins.variable} ${inter.variable}`}>
       <body>
         {children}
         <OwlWhatsApp />

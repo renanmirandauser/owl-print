@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * Botão flutuante assinatura: NÃO é o botão padrão do WhatsApp.
- * Mascote da coruja segurando um smartphone, balão de mensagem e
+ * Mascote da coruja (logo da marca), balão de mensagem e
  * rastreamento de clique em GA4 + Meta Pixel.
  */
 export function OwlWhatsApp() {
@@ -17,9 +18,7 @@ export function OwlWhatsApp() {
   const href = `https://wa.me/${phone}?text=${text}`;
 
   function handleClick() {
-    // GA4
     window.gtag?.("event", "whatsapp_click", { location: "floating_owl" });
-    // Meta Pixel
     window.fbq?.("track", "Contact", { method: "whatsapp" });
   }
 
@@ -31,7 +30,7 @@ export function OwlWhatsApp() {
             initial={{ opacity: 0, y: 8, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.95 }}
-            className="relative max-w-[220px] rounded-2xl bg-cream px-4 py-3 text-sm text-leather shadow-premium"
+            className="relative max-w-[220px] rounded-2xl border border-leather/10 bg-white px-4 py-3 text-sm text-ink shadow-premium"
           >
             <button
               onClick={() => setOpen(false)}
@@ -45,25 +44,24 @@ export function OwlWhatsApp() {
         )}
       </AnimatePresence>
 
-            <motion.a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={handleClick}
-          aria-label="Falar com a OWL PRINT no WhatsApp"
-          whileHover={{ scale: 1.06 }}
-          whileTap={{ scale: 0.95 }}
-          className="grid h-16 w-16 place-items-center rounded-full bg-white shadow-premium ring-2 ring-champagne animate-float"
-        >
-          <img
-            src="/public/owllogo.png"
-            alt="OWL PRINT"
-            className="h-12 w-12 object-contain"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).style.display = "none";
-            }}
-          />
-        </motion.a>
+      <motion.a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={handleClick}
+        aria-label="Falar com a OWL PRINT no WhatsApp"
+        whileHover={{ scale: 1.06 }}
+        whileTap={{ scale: 0.95 }}
+        className="grid h-16 w-16 place-items-center rounded-full border border-leather/10 bg-white shadow-premium ring-2 ring-champagne animate-float"
+      >
+        <Image
+          src="/owl-icon.png"
+          alt="OWL PRINT"
+          width={48}
+          height={48}
+          className="h-11 w-auto object-contain"
+        />
+      </motion.a>
     </div>
   );
 }
