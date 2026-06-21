@@ -25,8 +25,8 @@ export function Navbar() {
           <Image
             src="/owllogo.png"
             alt="OWL PRINT — Cardápios Personalizados"
-            width={150}
-            height={48}
+            width={180}
+            height={58}
             priority
             className="h-9 w-auto md:h-11"
           />
