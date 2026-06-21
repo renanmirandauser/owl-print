@@ -123,9 +123,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Image
             src="/owllogo.png"
             alt="OWL PRINT"
-            width={120}
-            height={36}
-            className="h-8 w-auto"
+            width={250}
+            height={75}
+            priority
+            className="h-20 w-auto"
           />
         </Link>
         <button onClick={() => setOpen(true)} aria-label="Abrir menu" className="text-ink">
