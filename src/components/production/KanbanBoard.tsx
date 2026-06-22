@@ -2,14 +2,14 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Calendar, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, Loader2, Archive } from "lucide-react";
 import {
   ORDER_STAGE,
   ORDER_STAGE_LABEL,
   ORDER_STAGE_COLOR,
   type OrderStage,
 } from "@/types";
-import { moveOrderStage, type OrderDTO } from "@/actions/orders";
+import { moveOrderStage, archiveOrder, type OrderDTO } from "@/actions/orders";
 import { BRL, cn } from "@/lib/utils";
 
 export function KanbanBoard({ initialOrders }: { initialOrders: OrderDTO[] }) {
@@ -36,6 +36,15 @@ export function KanbanBoard({ initialOrders }: { initialOrders: OrderDTO[] }) {
     const idx = ORDER_STAGE.indexOf(stage) + dir;
     if (idx < 0 || idx >= ORDER_STAGE.length) return;
     move(id, ORDER_STAGE[idx]);
+  }
+
+  function archive(id: string) {
+    const snapshot = orders;
+    setOrders((prev) => prev.filter((o) => o.id !== id));
+    startTransition(async () => {
+      const res = await archiveOrder(id);
+      if (!res.ok) setOrders(snapshot);
+    });
   }
 
   return (
@@ -120,6 +129,15 @@ export function KanbanBoard({ initialOrders }: { initialOrders: OrderDTO[] }) {
                         <ChevronRight className="h-4 w-4 text-leather" />
                       </button>
                     </div>
+
+                    {o.stage === "delivered" && (
+                      <button
+                        onClick={() => archive(o.id)}
+                        className="mt-2 inline-flex w-full items-center justify-center gap-1 rounded-md border border-premium/20 py-1 text-xs text-leather/70 transition-colors hover:bg-cream"
+                      >
+                        <Archive className="h-3 w-3" /> Arquivar (concluído)
+                      </button>
+                    )}
                   </article>
                 );
               })}

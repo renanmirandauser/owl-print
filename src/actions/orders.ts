@@ -24,6 +24,7 @@ export interface OrderDTO {
   total: number;
   deliveryForecast: string | null;
   internalNotes: string;
+  archived: boolean;
   createdAt: string | null;
 }
 
@@ -37,6 +38,7 @@ type LeanOrder = {
   total: number;
   deliveryForecast?: Date;
   internalNotes?: string;
+  archived?: boolean;
   createdAt?: Date;
 };
 
@@ -55,6 +57,7 @@ function serialize(o: LeanOrder): OrderDTO {
     total: o.total ?? 0,
     deliveryForecast: o.deliveryForecast ? new Date(o.deliveryForecast).toISOString() : null,
     internalNotes: o.internalNotes ?? "",
+    archived: !!o.archived,
     createdAt: o.createdAt ? new Date(o.createdAt).toISOString() : null,
   };
 }
@@ -73,7 +76,7 @@ async function nextCode(): Promise<string> {
 
 export async function listOrders(): Promise<OrderDTO[]> {
   await dbConnect();
-  const docs = await Order.find().sort({ createdAt: -1 }).lean<LeanOrder[]>();
+  const docs = await Order.find({ archived: { $ne: true } }).sort({ createdAt: -1 }).lean<LeanOrder[]>();
   return docs.map(serialize);
 }
 
@@ -192,5 +195,39 @@ export async function deleteOrder(id: string): Promise<ActionResult> {
   } catch (err) {
     console.error("deleteOrder:", err);
     return { ok: false, error: "Erro ao excluir." };
+  }
+}
+
+/* ─── Arquivamento ──────────────────────────────────────── */
+
+export async function listArchivedOrders(): Promise<OrderDTO[]> {
+  await dbConnect();
+  const docs = await Order.find({ archived: true }).sort({ updatedAt: -1 }).lean<LeanOrder[]>();
+  return docs.map(serialize);
+}
+
+export async function archiveOrder(id: string): Promise<ActionResult> {
+  try {
+    await dbConnect();
+    await Order.findByIdAndUpdate(id, { archived: true });
+    revalidatePath("/admin/producao");
+    revalidatePath("/admin/producao/arquivados");
+    return { ok: true };
+  } catch (err) {
+    console.error("archiveOrder:", err);
+    return { ok: false, error: "Erro ao arquivar." };
+  }
+}
+
+export async function unarchiveOrder(id: string): Promise<ActionResult> {
+  try {
+    await dbConnect();
+    await Order.findByIdAndUpdate(id, { archived: false });
+    revalidatePath("/admin/producao");
+    revalidatePath("/admin/producao/arquivados");
+    return { ok: true };
+  } catch (err) {
+    console.error("unarchiveOrder:", err);
+    return { ok: false, error: "Erro ao desarquivar." };
   }
 }

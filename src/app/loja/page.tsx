@@ -3,6 +3,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { StoreClient } from "@/components/site/StoreClient";
 import { listCatalog } from "@/actions/products";
 import { CATEGORY_LABEL } from "@/types";
+import { getLojaContent } from "@/actions/content";
 
 export const metadata: Metadata = {
   title: "Loja",
@@ -14,6 +15,7 @@ export const dynamic = "force-dynamic";
 
 export default async function LojaPage() {
   const products = await listCatalog();
+  const content = await getLojaContent();
   const items = products.map((p) => ({
     id: p.id,
     name: p.name,
@@ -32,13 +34,10 @@ export default async function LojaPage() {
       <section className="bg-cream">
         <div className="container py-12 text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-champagne">
-            Monte e envie em 1 minuto
+            {content.eyebrow}
           </p>
-          <h1 className="mt-2 font-display text-4xl font-bold text-leather">Loja</h1>
-          <p className="mx-auto mt-3 max-w-xl text-ink/60">
-            Escolha os produtos, defina as opções e a quantidade. Ao finalizar, seu orçamento é
-            enviado direto para o nosso WhatsApp — sem complicação.
-          </p>
+          <h1 className="mt-2 font-display text-4xl font-bold text-leather">{content.title}</h1>
+          <p className="mx-auto mt-3 max-w-xl text-ink/60">{content.description}</p>
         </div>
       </section>
 

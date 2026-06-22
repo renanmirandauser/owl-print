@@ -3,6 +3,10 @@ import { Hero } from "@/components/site/Hero";
 import { ProductCard } from "@/components/products/ProductCard";
 import { PRODUCT_CATEGORIES, CATEGORY_LABEL } from "@/types";
 import Link from "next/link";
+import { PartnersCarousel } from "@/components/site/PartnersCarousel";
+import { listPartners } from "@/actions/partners";
+
+export const dynamic = "force-dynamic";
 
 const STEPS = [
   {
@@ -26,10 +30,11 @@ const DIFFERENTIALS = [
   { t: "Personalização exclusiva", d: "Cada peça com a identidade única do seu negócio." },
   { t: "Materiais premium", d: "Couro selecionado e acabamentos sofisticados." },
   { t: "Design sofisticado", d: "Projetos que impressionam à primeira vista." },
-  { t: "Entrega nacional", d: "Atendemos restaurantes, bares hotéis, motéis e pubs em todo o Brasil." },
+  { t: "Entrega nacional", d: "Atendemos restaurantes e bares em todo o Brasil." },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const partners = await listPartners();
   return (
     <main>
       <Navbar />
@@ -51,11 +56,12 @@ export default function HomePage() {
       <section className="container py-20">
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-champagne">
-            Catálogo
+            Nosso catálogo
           </p>
           <h2 className="mt-2 font-display text-4xl font-bold text-leather">Nossos Produtos</h2>
           <p className="mx-auto mt-3 max-w-xl text-ink/60">
-            Soluções completas e personalizadas para elevar a experiência do seu cliente.
+            Soluções completas e personalizadas para elevar a experiência do seu cliente —
+            do cardápio aos detalhes da mesa.
           </p>
         </div>
 
@@ -98,6 +104,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <PartnersCarousel logos={partners.map((p) => ({ url: p.url, name: p.name }))} />
 
       {/* CTA final */}
       <section className="container py-20">

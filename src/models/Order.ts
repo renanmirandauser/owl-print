@@ -21,6 +21,7 @@ const OrderSchema = new Schema(
     total: { type: Number, default: 0 },
     deliveryForecast: Date,
     internalNotes: String,
+    archived: { type: Boolean, default: false, index: true },
   },
   { timestamps: true }
 );
