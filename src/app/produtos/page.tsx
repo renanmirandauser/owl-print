@@ -14,25 +14,7 @@ export const metadata: Metadata = {
 
 export default async function CatalogPage() {
   const products = await listCatalog();
-
-  // Rótulo da categoria (funciona para padrão e personalizada)
-  const labelOf = (cat: string) => CATEGORY_LABEL[cat as ProductCategory] ?? cat;
-
-  // Agrupa os produtos pelo rótulo da categoria
-  const groups = new Map<string, typeof products>();
-  for (const p of products) {
-    const label = labelOf(p.category);
-    const arr = groups.get(label) ?? [];
-    arr.push(p);
-    groups.set(label, arr);
-  }
-
-  // Ordena: categorias padrão primeiro (na ordem), depois as personalizadas
-  const defaultLabels = PRODUCT_CATEGORIES.map((c) => CATEGORY_LABEL[c]);
-  const orderedLabels = [
-    ...defaultLabels.filter((l) => groups.has(l)),
-    ...[...groups.keys()].filter((l) => !defaultLabels.includes(l)),
-  ];
+  const byCategory = (cat: ProductCategory) => products.filter((p) => p.category === cat);
 
   return (
     <main>
@@ -46,12 +28,12 @@ export default async function CatalogPage() {
         {products.length === 0 && (
           <p className="text-center text-leather/50">Catálogo em breve.</p>
         )}
-        {orderedLabels.map((label) => {
-          const items = groups.get(label) ?? [];
+        {PRODUCT_CATEGORIES.map((cat) => {
+          const items = byCategory(cat);
           if (items.length === 0) return null;
           return (
-            <section key={label}>
-              <h2 className="mb-6 font-display text-2xl text-leather">{label}</h2>
+            <section key={cat}>
+              <h2 className="mb-6 font-display text-2xl text-leather">{CATEGORY_LABEL[cat]}</h2>
               <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
                 {items.map((p) => (
                   <ProductCard
