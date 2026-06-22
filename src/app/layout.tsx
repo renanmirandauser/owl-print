@@ -19,13 +19,13 @@ export const metadata: Metadata = {
     template: "%s | OWL PRINT",
   },
   description:
-    "Cardápios, cartas de vinho e acessórios em couro personalizados para restaurantes, bares, hotéis e motéis. Design exclusivo e acabamento premium.",
+    "Cardápios, Jogos americanos, Porta-Contas, Porta-Talhares, Porta Copos para Restaurantes, bares, hotéis, motéis e PUB's. Design exclusivo e acabamento premium.",
   openGraph: {
     type: "website",
     locale: "pt_BR",
     siteName: "OWL PRINT",
     title: "OWL PRINT — Cardápios que Contam Histórias",
-    description: "Soluções personalizadas para restaurantes, bares, hotéis e motéis.",
+    description: "Soluções personalizadas para restaurantes, bares, hotéis, motéis e pubs.",
   },
   robots: { index: true, follow: true },
 };
