@@ -22,6 +22,7 @@ export default async function LojaPage() {
     sizes: p.sizes ?? [],
     colors: p.colors ?? [],
     finishes: p.finishes ?? [],
+    leathers: p.leathers ?? [],
   }));
 
   return (

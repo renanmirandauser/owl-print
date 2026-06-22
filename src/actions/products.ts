@@ -20,6 +20,7 @@ export interface ProductDTO {
   sizes: string[];
   colors: string[];
   finishes: string[];
+  leathers: string[];
   featured: boolean;
   active: boolean;
   gallery: CloudinaryImage[];
@@ -36,6 +37,7 @@ type LeanProduct = {
   sizes?: string[];
   colors?: string[];
   finishes?: string[];
+  leathers?: string[];
   featured?: boolean;
   active?: boolean;
   gallery?: CloudinaryImage[];
@@ -53,6 +55,7 @@ function serialize(p: LeanProduct): ProductDTO {
     sizes: p.sizes ?? [],
     colors: p.colors ?? [],
     finishes: p.finishes ?? [],
+    leathers: p.leathers ?? [],
     featured: !!p.featured,
     active: p.active !== false,
     gallery: (p.gallery ?? []).map((g) => ({ url: g.url, publicId: g.publicId, alt: g.alt })),

@@ -73,3 +73,26 @@ export async function deleteCatalogItem(id: string): Promise<Result> {
     return { ok: false, error: "Erro ao excluir." };
   }
 }
+
+/* Opções já prontas para o formulário de produto */
+export interface ProductFormOptions {
+  categories: string[];
+  colors: { name: string; hex?: string }[];
+  leathers: string[];
+  sizes: string[];
+}
+
+export async function getProductFormOptions(): Promise<ProductFormOptions> {
+  const [cats, colors, leathers, sizes] = await Promise.all([
+    listCatalogItems("category"),
+    listCatalogItems("color"),
+    listCatalogItems("leather"),
+    listCatalogItems("size"),
+  ]);
+  return {
+    categories: cats.map((c) => c.name),
+    colors: colors.map((c) => ({ name: c.name, hex: c.hex })),
+    leathers: leathers.map((c) => c.name),
+    sizes: sizes.map((c) => c.name),
+  };
+}

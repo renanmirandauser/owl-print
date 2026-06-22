@@ -1,10 +1,5 @@
 import { z } from "zod";
-import {
-  PRODUCT_CATEGORIES,
-  type ProductCategory,
-  SEGMENTS,
-  type Segment,
-} from "@/types";
+import { SEGMENTS, type Segment } from "@/types";
 
 /* Imagem (Cloudinary) — usada por produtos e portfólio */
 export const imageSchema = z.object({
@@ -55,13 +50,12 @@ export const entrySchema = z.object({
 /* Produto */
 export const productSchema = z.object({
   name: z.string().min(2, "Informe o nome"),
-  category: z
-    .string()
-    .refine((v) => PRODUCT_CATEGORIES.includes(v as ProductCategory), "Categoria inválida"),
+  category: z.string().min(1, "Informe a categoria"),
   description: z.string().optional(),
   sizes: z.array(z.string()).default([]),
   colors: z.array(z.string()).default([]),
   finishes: z.array(z.string()).default([]),
+  leathers: z.array(z.string()).default([]),
   featured: z.boolean().default(false),
   active: z.boolean().default(true),
   gallery: z.array(imageSchema).default([]),

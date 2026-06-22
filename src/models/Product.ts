@@ -1,5 +1,4 @@
 import { Schema, model, models, type InferSchemaType } from "mongoose";
-import { PRODUCT_CATEGORIES } from "@/types";
 
 const ImageSchema = new Schema(
   { url: { type: String, required: true }, publicId: String, alt: String },
@@ -9,11 +8,12 @@ const ImageSchema = new Schema(
 const ProductSchema = new Schema(
   {
     name: { type: String, required: true },
-    category: { type: String, enum: PRODUCT_CATEGORIES, required: true, index: true },
+    category: { type: String, required: true, index: true },
     description: { type: String, default: "" },
     sizes: [String],
     colors: [String],
     finishes: [String],
+    leathers: [String],
     featured: { type: Boolean, default: false, index: true },
     gallery: [ImageSchema],
     active: { type: Boolean, default: true },

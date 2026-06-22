@@ -12,9 +12,10 @@ type Item = {
   sizes: string[];
   colors: string[];
   finishes: string[];
+  leathers: string[];
 };
 
-type Line = { qty: number; size?: string; color?: string; finish?: string };
+type Line = { qty: number; size?: string; color?: string; finish?: string; leather?: string };
 
 export function StoreClient({ items }: { items: Item[] }) {
   const phone = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
@@ -33,6 +34,7 @@ export function StoreClient({ items }: { items: Item[] }) {
         size: item?.sizes?.[0],
         color: item?.colors?.[0],
         finish: item?.finishes?.[0],
+        leather: item?.leathers?.[0],
       };
       return { ...c, [id]: { ...prev, ...patch } };
     });
@@ -46,7 +48,7 @@ export function StoreClient({ items }: { items: Item[] }) {
   function buildMessage() {
     const parts = lines.map(([id, l]) => {
       const it = byId[id];
-      const opts = [l.size, l.color, l.finish].filter(Boolean).join(", ");
+      const opts = [l.size, l.color, l.leather, l.finish].filter(Boolean).join(", ");
       return `• ${l.qty}x ${it?.name}${opts ? ` (${opts})` : ""}`;
     });
     const header = customer
@@ -131,6 +133,17 @@ export function StoreClient({ items }: { items: Item[] }) {
                       ))}
                     </select>
                   )}
+                  {it.leathers.length > 0 && (
+                    <select
+                      className={selectCls}
+                      value={line?.leather ?? it.leathers[0]}
+                      onChange={(e) => setLine(it.id, { leather: e.target.value })}
+                    >
+                      {it.leathers.map((s) => (
+                        <option key={s} value={s}>Couro: {s}</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
 
                 <div className="mt-auto pt-4">
@@ -183,7 +196,7 @@ export function StoreClient({ items }: { items: Item[] }) {
             <ul className="divide-y divide-leather/10 py-2">
               {lines.map(([id, l]) => {
                 const it = byId[id];
-                const opts = [l.size, l.color, l.finish].filter(Boolean).join(" · ");
+                const opts = [l.size, l.color, l.leather, l.finish].filter(Boolean).join(" · ");
                 return (
                   <li key={id} className="flex items-start justify-between gap-2 py-2 text-sm">
                     <div>
