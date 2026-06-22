@@ -1,10 +1,10 @@
 import { Navbar } from "@/components/site/Navbar";
 import { Hero } from "@/components/site/Hero";
 import { ProductCard } from "@/components/products/ProductCard";
-import { PRODUCT_CATEGORIES, CATEGORY_LABEL } from "@/types";
 import Link from "next/link";
 import { PartnersCarousel } from "@/components/site/PartnersCarousel";
 import { listPartners } from "@/actions/partners";
+import { listDisplayCategories } from "@/actions/catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +35,7 @@ const DIFFERENTIALS = [
 
 export default async function HomePage() {
   const partners = await listPartners();
+  const categories = await listDisplayCategories();
   return (
     <main>
       <Navbar />
@@ -66,12 +67,12 @@ export default async function HomePage() {
         </div>
 
         <div className="mt-12 grid grid-cols-2 gap-5 md:grid-cols-4">
-          {PRODUCT_CATEGORIES.map((cat) => (
+          {categories.map((c) => (
             <ProductCard
-              key={cat}
-              slug={cat}
-              category={cat}
-              name={CATEGORY_LABEL[cat]}
+              key={c.label}
+              slug={c.value}
+              category={c.value}
+              name={c.label}
               href="/produtos"
             />
           ))}
