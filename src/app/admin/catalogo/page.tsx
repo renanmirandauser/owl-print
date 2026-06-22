@@ -1,5 +1,6 @@
 import { CatalogManager } from "@/components/admin/CatalogManager";
 import { listCatalogItems } from "@/actions/catalog";
+import { SeedDefaultsButton } from "@/components/admin/SeedDefaultsButton";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,10 @@ export default async function CatalogoPage() {
           Cadastre as opções que serão usadas nos produtos e na Loja: categorias, cores,
           tipos de couro e tamanhos.
         </p>
+      </div>
+
+      <div className="mb-6">
+        <SeedDefaultsButton />
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">

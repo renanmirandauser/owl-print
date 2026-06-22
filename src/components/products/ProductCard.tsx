@@ -10,7 +10,7 @@ import { track } from "@/components/analytics/Analytics";
 export interface ProductCardProps {
   slug: string;
   name: string;
-  category: ProductCategory;
+  category: string;
   image?: string;
   href?: string;
 }
@@ -45,7 +45,7 @@ export function ProductCard({ slug, name, category, image, href }: ProductCardPr
 
         <div className="p-4">
           <span className="text-xs uppercase tracking-wider text-champagne">
-            {CATEGORY_LABEL[category] ?? category}
+            {CATEGORY_LABEL[category as ProductCategory] ?? category}
           </span>
           <h3 className="mt-1 font-display text-lg text-leather">{name}</h3>
           <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-premium transition-colors group-hover:text-burgundy">

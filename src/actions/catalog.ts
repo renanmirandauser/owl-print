@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { dbConnect } from "@/lib/mongodb";
 import { CatalogItem } from "@/models/CatalogItem";
+import { PRODUCT_CATEGORIES, CATEGORY_LABEL } from "@/types";
 
 export type CatalogKind = "category" | "color" | "leather" | "size";
 
@@ -95,4 +96,40 @@ export async function getProductFormOptions(): Promise<ProductFormOptions> {
     leathers: leathers.map((c) => c.name),
     sizes: sizes.map((c) => c.name),
   };
+}
+
+/* Importa as 7 categorias padrão para a lista editável (sem duplicar) */
+export async function seedDefaultCategories(): Promise<
+  { ok: true; added: number } | { ok: false; error: string }
+> {
+  try {
+    await dbConnect();
+    const existing = new Set(
+      (await listCatalogItems("category")).map((c) => c.name.toLowerCase())
+    );
+    let added = 0;
+    for (const c of PRODUCT_CATEGORIES) {
+      const label = CATEGORY_LABEL[c];
+      if (!existing.has(label.toLowerCase())) {
+        await CatalogItem.create({ kind: "category", name: label });
+        added++;
+      }
+    }
+    revalidatePath("/admin/catalogo");
+    revalidatePath("/");
+    revalidatePath("/produtos");
+    return { ok: true, added };
+  } catch (err) {
+    console.error("seedDefaultCategories:", err);
+    return { ok: false, error: "Erro ao importar." };
+  }
+}
+
+/* Lista unificada de categorias para exibição (padrões + cadastradas, sem repetir) */
+export async function listDisplayCategories(): Promise<{ value: string; label: string }[]> {
+  const managed = await listCatalogItems("category");
+  const defaults = PRODUCT_CATEGORIES.map((c) => ({ value: c as string, label: CATEGORY_LABEL[c] }));
+  const managedMapped = managed.map((m) => ({ value: m.name, label: m.name }));
+  const all = [...defaults, ...managedMapped];
+  return all.filter((c, i, arr) => arr.findIndex((x) => x.label === c.label) === i);
 }
