@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Navbar } from "@/components/site/Navbar";
 import { getProductBySlug } from "@/actions/products";
 import { CATEGORY_LABEL } from "@/types";
+import { ProductGallery } from "@/components/products/ProductGallery";
 
 export const dynamic = "force-dynamic";
 
@@ -58,24 +59,9 @@ export default async function ProductPage({
         </Link>
 
         <div className="mt-6 grid gap-10 md:grid-cols-2">
-          {/* Galeria */}
+          {/* Galeria com lightbox */}
           <div>
-            <div className="relative aspect-square overflow-hidden rounded-xl bg-cream">
-              {p.gallery[0] ? (
-                <Image src={p.gallery[0].url} alt={p.name} fill sizes="(max-width:768px) 100vw, 50vw" className="object-cover" priority />
-              ) : (
-                <div className="flex h-full items-center justify-center text-6xl text-premium/30">🦉</div>
-              )}
-            </div>
-            {p.gallery.length > 1 && (
-              <div className="mt-3 grid grid-cols-4 gap-3">
-                {p.gallery.slice(0, 4).map((g, i) => (
-                  <div key={i} className="relative aspect-square overflow-hidden rounded-lg bg-cream">
-                    <Image src={g.url} alt={`${p.name} ${i + 1}`} fill sizes="120px" className="object-cover" />
-                  </div>
-                ))}
-              </div>
-            )}
+            <ProductGallery images={p.gallery} name={p.name} />
           </div>
 
           {/* Info */}

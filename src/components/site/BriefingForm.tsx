@@ -9,13 +9,19 @@ const inputCls =
   "w-full rounded-lg border border-leather/15 bg-white px-3.5 py-2.5 text-[15px] text-ink " +
   "outline-none transition-colors placeholder:text-ink/30 focus:border-champagne focus:ring-2 focus:ring-champagne/25";
 
+/* Estilo e tipo de projeto continuam fixos (não dependem do catálogo) */
 const STYLE_OPT = ["Sofisticado / Premium", "Casual", "Rústico", "Moderno", "Clássico", "Outro"];
 const BRANDING_OPT = ["Sim, já tenho logo", "Não tenho", "Está em criação"];
 const PROJECT_OPT = ["Nova criação", "Reformular cardápio existente", "Reimpressão"];
-const PRODUCT_OPT = ["Cardápio", "Carta de Vinhos", "Menu de Drinks", "Jogo Americano", "Porta-Contas", "Porta-Talheres", "Porta-Copos", "Display", "Outro"];
-const SIZE_OPT = ["A4", "A5", "Personalizado", "Não sei"];
-const FINISH_OPT = ["Hot Stamping", "Baixo Relevo", "Laser", "Não sei"];
-const LOGO_OPT = ["Centro", "Superior", "Inferior", "Não sei"];
+const LOGO_OPT = [
+  "Superior — Esquerda",
+  "Superior — Centro",
+  "Superior — Direita",
+  "Inferior — Esquerda",
+  "Inferior — Centro",
+  "Inferior — Direita",
+  "Não sei",
+];
 const CONTENT_OPT = ["Sim, tenho tudo pronto", "Parcialmente", "Não, preciso de ajuda"];
 const DEADLINE_OPT = ["Sem pressa", "Até 15 dias", "Até 30 dias", "Urgente"];
 const BUDGET_OPT = ["Até R$ 1.000", "R$ 1.000 a R$ 3.000", "R$ 3.000 a R$ 5.000", "Acima de R$ 5.000", "Prefiro não informar"];
@@ -28,16 +34,37 @@ const EMPTY = {
   references: "", deadline: "", budget: "", notes: "", website: "",
 };
 
-export function BriefingForm({ segmentOptions = [] }: { segmentOptions?: string[] }) {
+interface Props {
+  segmentOptions?: string[];
+  categoryOptions?: string[];  // "O que você precisa?"
+  colorOptions?: string[];     // chips de cor
+  leatherOptions?: string[];   // chips de couro
+  finishOptions?: string[];    // chips de acabamento
+  sizeOptions?: string[];      // chips de tamanho
+}
+
+export function BriefingForm({
+  segmentOptions = [],
+  categoryOptions = [],
+  colorOptions = [],
+  leatherOptions = [],
+  finishOptions = [],
+  sizeOptions = [],
+}: Props) {
   const [pending, startTransition] = useTransition();
   const [form, setForm] = useState({ ...EMPTY });
   const [productTypes, setProductTypes] = useState<string[]>([]);
   const [finishes, setFinishes] = useState<string[]>([]);
+  const [colors, setColors] = useState<string[]>([]);
+  const [leathers, setLeathers] = useState<string[]>([]);
+  const [sizes, setSizes] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
-  const set = (k: keyof typeof EMPTY) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    setForm((f) => ({ ...f, [k]: e.target.value }));
+  const set =
+    (k: keyof typeof EMPTY) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+      setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const toggle = (list: string[], setList: (v: string[]) => void, v: string) =>
     setList(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
@@ -45,21 +72,19 @@ export function BriefingForm({ segmentOptions = [] }: { segmentOptions?: string[
   function submit() {
     setError(null);
     startTransition(async () => {
-      const res = await createBriefing({ ...form, productTypes, finishes });
-      if (!res.ok) {
-        setError(res.error);
-        return;
-      }
+      const res = await createBriefing({
+        ...form,
+        productTypes,
+        finishes,
+        colorPreference: colors.join(", "),
+        leathers: leathers.join(", "),
+      } as Parameters<typeof createBriefing>[0]);
+      if (!res.ok) { setError(res.error); return; }
       try {
-        const w = window as unknown as {
-          gtag?: (...a: unknown[]) => void;
-          fbq?: (...a: unknown[]) => void;
-        };
+        const w = window as unknown as { gtag?: (...a: unknown[]) => void; fbq?: (...a: unknown[]) => void };
         w.gtag?.("event", "briefing_submit");
         w.fbq?.("track", "Lead", { content_name: "Briefing" });
-      } catch {
-        /* ignora */
-      }
+      } catch { /* ignora */ }
       setDone(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
@@ -84,98 +109,87 @@ export function BriefingForm({ segmentOptions = [] }: { segmentOptions?: string[
 
   return (
     <div className="space-y-6">
-      {/* honeypot anti-spam (escondido) */}
-      <input
-        type="text"
-        name="website"
-        value={form.website}
-        onChange={set("website")}
-        tabIndex={-1}
-        autoComplete="off"
-        className="hidden"
-        aria-hidden
-      />
+      {/* honeypot anti-spam */}
+      <input type="text" name="website" value={form.website} onChange={set("website")} tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
 
       {/* 1. Seus dados */}
       <Section title="1. Seus dados" subtitle="Para entrarmos em contato com você.">
-        <Field label="Seu nome" required>
-          <input className={inputCls} value={form.responsible} onChange={set("responsible")} placeholder="Ex.: Maria Silva" />
-        </Field>
-        <Field label="Nome do estabelecimento" required>
-          <input className={inputCls} value={form.company} onChange={set("company")} placeholder="Ex.: Restaurante Villa" />
-        </Field>
-        <Field label="WhatsApp" required>
-          <input className={inputCls} value={form.whatsapp} onChange={set("whatsapp")} placeholder="(11) 99999-9999" />
-        </Field>
-        <Field label="E-mail">
-          <input className={inputCls} value={form.email} onChange={set("email")} placeholder="contato@seurestaurante.com" />
-        </Field>
-        <Field label="Instagram">
-          <input className={inputCls} value={form.instagram} onChange={set("instagram")} placeholder="@seurestaurante" />
-        </Field>
-        <Field label="Cidade / Estado">
-          <input className={inputCls} value={form.city} onChange={set("city")} placeholder="Ex.: São Paulo / SP" />
-        </Field>
+        <Field label="Seu nome" required><input className={inputCls} value={form.responsible} onChange={set("responsible")} placeholder="Ex.: Maria Silva" /></Field>
+        <Field label="Nome do estabelecimento" required><input className={inputCls} value={form.company} onChange={set("company")} placeholder="Ex.: Restaurante Villa" /></Field>
+        <Field label="WhatsApp" required><input className={inputCls} value={form.whatsapp} onChange={set("whatsapp")} placeholder="(11) 99999-9999" /></Field>
+        <Field label="E-mail"><input className={inputCls} value={form.email} onChange={set("email")} placeholder="contato@seurestaurante.com" /></Field>
+        <Field label="Instagram"><input className={inputCls} value={form.instagram} onChange={set("instagram")} placeholder="@seurestaurante" /></Field>
+        <Field label="Cidade / Estado"><input className={inputCls} value={form.city} onChange={set("city")} placeholder="Ex.: São Paulo / SP" /></Field>
       </Section>
 
-      {/* 2. Sobre o estabelecimento */}
+      {/* 2. Estabelecimento */}
       <Section title="2. Sobre o estabelecimento" subtitle="Conte um pouco sobre o seu negócio.">
         <Field label="Segmento">
-          segmentOptions.length === 0 ? (
+          {segmentOptions.length === 0 ? (
             <div className="rounded-lg border border-dashed border-leather/25 bg-cream/50 px-3.5 py-2.5 text-sm text-ink/60">
               Nenhum segmento cadastrado.{" "}
-              <a href="/admin/catalogo" target="_blank" className="font-semibold text-champagne hover:underline">
-                Cadastrar no Catálogo
-              </a>
+              <a href="/admin/catalogo" target="_blank" className="font-semibold text-champagne hover:underline">Cadastrar no Catálogo</a>
             </div>
           ) : (
             <Select value={form.segment} onChange={set("segment")} options={segmentOptions} />
-          )
+          )}
         </Field>
-        <Field label="Estilo do estabelecimento">
-          <Select value={form.style} onChange={set("style")} options={STYLE_OPT} />
-        </Field>
-        <Field label="Já possui logo / identidade visual?">
-          <Select value={form.hasBranding} onChange={set("hasBranding")} options={BRANDING_OPT} />
-        </Field>
-        <Field label="Público-alvo">
-          <input className={inputCls} value={form.audience} onChange={set("audience")} placeholder="Ex.: famílias, executivos, jovens..." />
-        </Field>
+        <Field label="Estilo do estabelecimento"><Select value={form.style} onChange={set("style")} options={STYLE_OPT} /></Field>
+        <Field label="Já possui logo / identidade visual?"><Select value={form.hasBranding} onChange={set("hasBranding")} options={BRANDING_OPT} /></Field>
+        <Field label="Público-alvo"><input className={inputCls} value={form.audience} onChange={set("audience")} placeholder="Ex.: famílias, executivos, jovens..." /></Field>
       </Section>
 
       {/* 3. Sobre o cardápio */}
       <Section title="3. Sobre o cardápio" subtitle="Os detalhes da criação que você precisa.">
-        <Field label="Tipo de projeto">
-          <Select value={form.projectType} onChange={set("projectType")} options={PROJECT_OPT} />
-        </Field>
-        <div className="sm:col-span-2">
-          <Field label="O que você precisa?" hint="Pode marcar mais de um.">
-            <Chips options={PRODUCT_OPT} selected={productTypes} onToggle={(v) => toggle(productTypes, setProductTypes, v)} />
+        <Field label="Tipo de projeto"><Select value={form.projectType} onChange={set("projectType")} options={PROJECT_OPT} /></Field>
+
+        {categoryOptions.length > 0 && (
+          <div className="sm:col-span-2">
+            <Field label="O que você precisa?" hint="Pode marcar mais de um.">
+              <Chips options={categoryOptions} selected={productTypes} onToggle={(v) => toggle(productTypes, setProductTypes, v)} />
+            </Field>
+          </div>
+        )}
+
+        <Field label="Quantidade desejada"><input className={inputCls} value={form.quantity} onChange={set("quantity")} placeholder="Ex.: 20 unidades" /></Field>
+
+        {sizeOptions.length > 0 ? (
+          <Field label="Tamanho" hint="Pode marcar mais de um.">
+            <Chips options={sizeOptions} selected={sizes} onToggle={(v) => toggle(sizes, setSizes, v)} />
           </Field>
-        </div>
-        <Field label="Quantidade desejada">
-          <input className={inputCls} value={form.quantity} onChange={set("quantity")} placeholder="Ex.: 20 unidades" />
-        </Field>
-        <Field label="Tamanho">
-          <Select value={form.size} onChange={set("size")} options={SIZE_OPT} />
-        </Field>
-        <Field label="Cor / couro de preferência">
-          <input className={inputCls} value={form.colorPreference} onChange={set("colorPreference")} placeholder="Ex.: Marrom, Preto, Vinho..." />
-        </Field>
+        ) : (
+          <Field label="Tamanho"><input className={inputCls} value={form.size} onChange={set("size")} placeholder="Ex.: A4, A5..." /></Field>
+        )}
+
+        {colorOptions.length > 0 ? (
+          <Field label="Cor de preferência" hint="Pode marcar mais de um.">
+            <Chips options={colorOptions} selected={colors} onToggle={(v) => toggle(colors, setColors, v)} />
+          </Field>
+        ) : (
+          <Field label="Cor de preferência"><input className={inputCls} value={form.colorPreference ?? ""} onChange={set("colorPreference")} placeholder="Ex.: Marrom, Preto..." /></Field>
+        )}
+
+        {leatherOptions.length > 0 && (
+          <Field label="Tipo de couro" hint="Pode marcar mais de um.">
+            <Chips options={leatherOptions} selected={leathers} onToggle={(v) => toggle(leathers, setLeathers, v)} />
+          </Field>
+        )}
+
+        {finishOptions.length > 0 ? (
+          <div className="sm:col-span-2">
+            <Field label="Acabamento" hint="Pode marcar mais de um.">
+              <Chips options={finishOptions} selected={finishes} onToggle={(v) => toggle(finishes, setFinishes, v)} />
+            </Field>
+          </div>
+        ) : null}
+
         <Field label="Posição da logo">
           <Select value={form.logoPosition} onChange={set("logoPosition")} options={LOGO_OPT} />
         </Field>
-        <div className="sm:col-span-2">
-          <Field label="Acabamento" hint="Pode marcar mais de um.">
-            <Chips options={FINISH_OPT} selected={finishes} onToggle={(v) => toggle(finishes, setFinishes, v)} />
-          </Field>
-        </div>
-        <Field label="Nº de páginas / itens (aprox.)">
-          <input className={inputCls} value={form.pages} onChange={set("pages")} placeholder="Ex.: 12 páginas" />
-        </Field>
-        <Field label="Idiomas">
-          <input className={inputCls} value={form.languages} onChange={set("languages")} placeholder="Ex.: Português / Inglês" />
-        </Field>
+
+        <Field label="Nº de páginas / itens (aprox.)"><input className={inputCls} value={form.pages} onChange={set("pages")} placeholder="Ex.: 12 páginas" /></Field>
+        <Field label="Idiomas"><input className={inputCls} value={form.languages} onChange={set("languages")} placeholder="Ex.: Português / Inglês" /></Field>
+
         <div className="sm:col-span-2">
           <Field label="Você já tem o conteúdo (textos e itens) do cardápio?">
             <Select value={form.contentReady} onChange={set("contentReady")} options={CONTENT_OPT} />
@@ -190,12 +204,8 @@ export function BriefingForm({ segmentOptions = [] }: { segmentOptions?: string[
             <textarea rows={3} className={inputCls} value={form.references} onChange={set("references")} placeholder="Ex.: gosto de cardápios escuros, com letras douradas..." />
           </Field>
         </div>
-        <Field label="Prazo desejado">
-          <Select value={form.deadline} onChange={set("deadline")} options={DEADLINE_OPT} />
-        </Field>
-        <Field label="Faixa de orçamento">
-          <Select value={form.budget} onChange={set("budget")} options={BUDGET_OPT} />
-        </Field>
+        <Field label="Prazo desejado"><Select value={form.deadline} onChange={set("deadline")} options={DEADLINE_OPT} /></Field>
+        <Field label="Faixa de orçamento"><Select value={form.budget} onChange={set("budget")} options={BUDGET_OPT} /></Field>
         <div className="sm:col-span-2">
           <Field label="Observações">
             <textarea rows={3} className={inputCls} value={form.notes} onChange={set("notes")} placeholder="Qualquer outra informação importante para o seu projeto." />
@@ -204,9 +214,7 @@ export function BriefingForm({ segmentOptions = [] }: { segmentOptions?: string[
       </Section>
 
       {error && (
-        <p className="rounded-lg border border-burgundy/30 bg-burgundy/5 px-4 py-3 text-sm font-medium text-burgundy">
-          {error}
-        </p>
+        <p className="rounded-lg border border-burgundy/30 bg-burgundy/5 px-4 py-3 text-sm font-medium text-burgundy">{error}</p>
       )}
 
       <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end">
@@ -220,7 +228,7 @@ export function BriefingForm({ segmentOptions = [] }: { segmentOptions?: string[
   );
 }
 
-/* ─── subcomponentes ───────────────────────────────────────── */
+/* ─── sub-componentes ─── */
 function Section({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
     <section className="rounded-2xl border border-leather/10 bg-white p-6 shadow-soft">
@@ -231,17 +239,7 @@ function Section({ title, subtitle, children }: { title: string; subtitle?: stri
   );
 }
 
-function Field({
-  label,
-  hint,
-  required,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  required?: boolean;
-  children: React.ReactNode;
-}) {
+function Field({ label, hint, required, children }: { label: string; hint?: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div>
       <label className="mb-1.5 block text-sm font-semibold text-ink">
@@ -253,52 +251,24 @@ function Field({
   );
 }
 
-function Select({
-  value,
-  onChange,
-  options,
-}: {
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  options: string[];
-}) {
+function Select({ value, onChange, options }: { value: string; onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void; options: string[] }) {
   return (
     <select className={inputCls} value={value} onChange={onChange}>
       <option value="">Selecione...</option>
-      {options.map((o) => (
-        <option key={o} value={o}>
-          {o}
-        </option>
-      ))}
+      {options.map((o) => <option key={o} value={o}>{o}</option>)}
     </select>
   );
 }
 
-function Chips({
-  options,
-  selected,
-  onToggle,
-}: {
-  options: string[];
-  selected: string[];
-  onToggle: (v: string) => void;
-}) {
+function Chips({ options, selected, onToggle }: { options: string[]; selected: string[]; onToggle: (v: string) => void }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 pt-1">
       {options.map((o) => {
         const on = selected.includes(o);
         return (
-          <button
-            key={o}
-            type="button"
-            onClick={() => onToggle(o)}
-            className={
-              "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors " +
-              (on
-                ? "border-champagne bg-champagne text-ink"
-                : "border-leather/20 bg-white text-ink/70 hover:border-champagne hover:bg-champagne/10")
-            }
-          >
+          <button key={o} type="button" onClick={() => onToggle(o)}
+            className={"rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors " +
+              (on ? "border-champagne bg-champagne text-ink" : "border-leather/20 bg-white text-ink/70 hover:border-champagne hover:bg-champagne/10")}>
             {o}
           </button>
         );

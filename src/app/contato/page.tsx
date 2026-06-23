@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
 import { Navbar } from "@/components/site/Navbar";
 import { ContactForm } from "@/components/site/ContactForm";
+import { listSegments } from "@/actions/catalog";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Contato",
-  description:
-    "Fale com a OWL PRINT e solicite seu orçamento.",
+  description: "Fale com a OWL PRINT e solicite seu orçamento.",
 };
 
 function Info({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
     <div className="flex gap-3 border-b border-premium/10 py-3 last:border-0">
-      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-cream text-lg">
-        {icon}
-      </div>
+      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-cream text-lg">{icon}</div>
       <div>
         <p className="text-xs uppercase tracking-wide text-leather/50">{label}</p>
         <p className="text-sm text-leather">{value}</p>
@@ -22,7 +22,9 @@ function Info({ icon, label, value }: { icon: string; label: string; value: stri
   );
 }
 
-export default function ContatoPage() {
+export default async function ContatoPage() {
+  const segments = await listSegments();
+
   return (
     <main>
       <Navbar />
@@ -48,12 +50,11 @@ export default function ContatoPage() {
             MAPA — SÃO PAULO, SP
           </div>
         </div>
-
-        <ContactForm />
+        <ContactForm segmentOptions={segments} />
       </div>
 
       <footer className="bg-ink py-8 text-center text-sm text-cream/50">
-        © {new Date().getFullYear()} OWL PRINT — Cardápios Personalizados. Todos os direitos reservados.
+        © {new Date().getFullYear()} OWL PRINT — Cardápios Personalizados.
       </footer>
     </main>
   );

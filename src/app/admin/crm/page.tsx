@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Plus, Search, FileSpreadsheet } from "lucide-react";
 import { listClients } from "@/actions/clients";
-import { ClientStatusBadge } from "@/components/crm/ClientStatusBadge";
 import { DeleteAllLeadsButton } from "@/components/crm/DeleteAllLeadsButton";
+import { CrmLeadsTable } from "@/components/crm/CrmLeadsTable";
 import { LEAD_STATUS, LEAD_STATUS_LABEL, type LeadStatus } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -20,8 +20,6 @@ export default async function CrmPage({
   const { status, q } = await searchParams;
   const active = (TABS.find((t) => t.value === status)?.value ?? "all") as LeadStatus | "all";
   const clients = await listClients({ status: active, q });
-
-  // total geral (para o botão excluir todos — só sem filtros)
   const allClients = active === "all" && !q ? clients : await listClients({});
 
   return (
@@ -29,10 +27,7 @@ export default async function CrmPage({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-3xl font-bold text-leather">CRM — Leads</h1>
         <div className="flex flex-wrap gap-2">
-          <Link
-            href="/admin/crm/importar"
-            className="inline-flex items-center gap-2 rounded-lg border border-leather/20 px-4 py-2 text-sm font-medium text-leather transition-colors hover:bg-leather/5"
-          >
+          <Link href="/admin/crm/importar" className="inline-flex items-center gap-2 rounded-lg border border-leather/20 px-4 py-2 text-sm font-medium text-leather transition-colors hover:bg-leather/5">
             <FileSpreadsheet className="h-4 w-4" /> Importar Excel
           </Link>
           <Link href="/admin/crm/novo" className="btn-gold !py-2 !px-4">
@@ -56,8 +51,8 @@ export default async function CrmPage({
         <button className="btn-gold !py-2 !px-4">Buscar</button>
       </form>
 
-      {/* Filtros de status */}
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-b border-premium/10 pb-0">
+      {/* Abas de status */}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-b border-premium/10">
         <div className="flex flex-wrap gap-1">
           {TABS.map((t) => {
             const params = new URLSearchParams();
@@ -81,55 +76,23 @@ export default async function CrmPage({
           })}
         </div>
 
-        {/* Botão excluir todos — só aparece na aba "Todos" sem filtro de busca */}
         {active === "all" && !q && allClients.length > 0 && (
           <DeleteAllLeadsButton count={allClients.length} />
         )}
       </div>
 
-      {/* Lista */}
-      <div className="mt-4 overflow-hidden rounded-xl border border-premium/10 bg-white">
-        {clients.length === 0 ? (
-          <div className="p-12 text-center text-leather/50">
-            Nenhum lead encontrado.{" "}
-            <Link href="/admin/crm/novo" className="text-premium underline">
-              Cadastrar o primeiro
-            </Link>
-            .
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] text-sm">
-              <thead className="bg-cream/60 text-left text-xs uppercase tracking-wider text-leather/50">
-                <tr>
-                  <th className="px-4 py-3">Nome</th>
-                  <th className="px-4 py-3">Empresa</th>
-                  <th className="px-4 py-3">Contato</th>
-                  <th className="px-4 py-3">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-premium/10">
-                {clients.map((c) => (
-                  <tr key={c.id} className="transition-colors hover:bg-cream/40">
-                    <td className="px-4 py-3">
-                      <Link href={`/admin/crm/${c.id}`} className="font-semibold text-premium">
-                        {c.name}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 text-leather">{c.company || "—"}</td>
-                    <td className="px-4 py-3 text-leather/60">
-                      {c.phone || c.whatsapp || c.email || "—"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <ClientStatusBadge status={c.status} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      {/* Tabela com checkbox (componente client) */}
+      <CrmLeadsTable
+        clients={clients.map((c) => ({
+          id: c.id,
+          name: c.name,
+          company: c.company,
+          phone: c.phone,
+          whatsapp: c.whatsapp,
+          email: c.email,
+          status: c.status,
+        }))}
+      />
     </div>
   );
 }

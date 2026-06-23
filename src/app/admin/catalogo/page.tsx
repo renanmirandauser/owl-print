@@ -4,12 +4,13 @@ import { listCatalogItems } from "@/actions/catalog";
 export const dynamic = "force-dynamic";
 
 export default async function CatalogoPage() {
-  const [categories, colors, leathers, sizes, segments] = await Promise.all([
+  const [categories, colors, leathers, sizes, segments, finishes] = await Promise.all([
     listCatalogItems("category"),
     listCatalogItems("color"),
     listCatalogItems("leather"),
     listCatalogItems("size"),
     listCatalogItems("segment"),
+    listCatalogItems("finish"),
   ]);
 
   return (
@@ -17,48 +18,17 @@ export default async function CatalogoPage() {
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-leather">Catálogo</h1>
         <p className="mt-2 text-[15px] text-ink/70">
-          Cadastre as opções usadas nos produtos, na Loja e no Portfólio: categorias, cores,
-          tipos de couro, tamanhos e segmentos.
+          Gerencie todas as opções usadas nos produtos, na Loja, no Portfólio e no Briefing.
         </p>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
-        <CatalogManager
-          kind="category"
-          title="Categorias"
-          description="Tipos de produto (ex.: Cardápios, Cartas de Vinho, Porta-Contas)."
-          items={categories}
-          placeholder="Ex.: Cartas de Vinho"
-        />
-        <CatalogManager
-          kind="color"
-          title="Cores"
-          description="Paleta de cores disponíveis. Escolha a cor e dê um nome."
-          items={colors}
-          withColor
-          placeholder="Ex.: Marrom Café"
-        />
-        <CatalogManager
-          kind="leather"
-          title="Tipos de Couro"
-          description="Tipos de couro (ex.: Couro Sintético, Couro Legítimo)."
-          items={leathers}
-          placeholder="Ex.: Couro Sintético"
-        />
-        <CatalogManager
-          kind="size"
-          title="Tamanhos"
-          description="Tamanhos disponíveis (ex.: A4, A5, 21x30cm)."
-          items={sizes}
-          placeholder="Ex.: A4 (21x30cm)"
-        />
-        <CatalogManager
-          kind="segment"
-          title="Segmentos"
-          description="Segmentos de cliente para o Portfólio (ex.: Restaurante, Bar, Hotel, Motel, Pub)."
-          items={segments}
-          placeholder="Ex.: Restaurante"
-        />
+        <CatalogManager kind="category" title="Categorias" description="Tipos de produto (ex.: Cardápios, Cartas de Vinho, Porta-Contas)." items={categories} placeholder="Ex.: Cartas de Vinho" />
+        <CatalogManager kind="color" title="Cores" description="Paleta de cores disponíveis. Escolha a cor e dê um nome." items={colors} withColor placeholder="Ex.: Marrom Café" />
+        <CatalogManager kind="leather" title="Tipos de Couro" description="Couros disponíveis (ex.: Couro Sintético, Couro Legítimo)." items={leathers} placeholder="Ex.: Couro Sintético" />
+        <CatalogManager kind="size" title="Tamanhos" description="Tamanhos disponíveis (ex.: A4, A5, 21x30cm)." items={sizes} placeholder="Ex.: A4 (21x30cm)" />
+        <CatalogManager kind="finish" title="Acabamentos" description="Tipos de acabamento (ex.: Hot Stamping, Baixo Relevo, Laser, Silk)." items={finishes} placeholder="Ex.: Hot Stamping" />
+        <CatalogManager kind="segment" title="Segmentos" description="Segmentos para o Portfólio e Briefing (ex.: Restaurante, Bar, Hotel, Motel)." items={segments} placeholder="Ex.: Restaurante" />
       </div>
     </div>
   );

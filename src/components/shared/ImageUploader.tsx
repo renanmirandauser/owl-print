@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Upload, X, Loader2, Star } from "lucide-react";
+import { Upload, X, Loader2, Star, PencilLine, Check } from "lucide-react";
 import type { CloudinaryImage } from "@/types";
 
 const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
@@ -13,20 +13,15 @@ interface Props {
   onChange: (images: CloudinaryImage[]) => void;
 }
 
-/**
- * Upload direto (unsigned) para o Cloudinary. A primeira imagem é a principal.
- * Requer NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME e NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET.
- */
 export function ImageUploader({ value, onChange }: Props) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editingIdx, setEditingIdx] = useState<number | null>(null);
+  const [editText, setEditText] = useState("");
 
   async function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
-    if (!CLOUD || !PRESET) {
-      setError("Configure as variáveis do Cloudinary no .env.local.");
-      return;
-    }
+    if (!CLOUD || !PRESET) { setError("Configure as variáveis do Cloudinary no .env.local."); return; }
     setError(null);
     setUploading(true);
     try {
@@ -35,10 +30,7 @@ export function ImageUploader({ value, onChange }: Props) {
         const form = new FormData();
         form.append("file", file);
         form.append("upload_preset", PRESET);
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, {
-          method: "POST",
-          body: form,
-        });
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, { method: "POST", body: form });
         if (!res.ok) throw new Error("upload");
         const data = await res.json();
         uploaded.push({ url: data.secure_url, publicId: data.public_id });
@@ -51,52 +43,82 @@ export function ImageUploader({ value, onChange }: Props) {
     }
   }
 
-  function remove(i: number) {
-    onChange(value.filter((_, idx) => idx !== i));
-  }
-
+  function remove(i: number) { onChange(value.filter((_, idx) => idx !== i)); }
   function makeMain(i: number) {
     if (i === 0) return;
     const next = [...value];
     const [img] = next.splice(i, 1);
     onChange([img, ...next]);
   }
+  function startEdit(i: number) { setEditingIdx(i); setEditText(value[i].alt ?? ""); }
+  function saveEdit(i: number) {
+    const next = [...value];
+    next[i] = { ...next[i], alt: editText.trim() };
+    onChange(next);
+    setEditingIdx(null);
+  }
 
   return (
     <div>
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {value.map((img, i) => (
-          <div key={img.publicId || i} className="group relative aspect-square overflow-hidden rounded-lg border border-premium/15">
-            <Image src={img.url} alt={img.alt || ""} fill sizes="120px" className="object-cover" />
-            {i === 0 && (
-              <span className="absolute left-1 top-1 inline-flex items-center gap-1 rounded bg-champagne px-1.5 py-0.5 text-[10px] font-medium text-leather">
-                <Star className="h-3 w-3" /> Principal
-              </span>
-            )}
-            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-leather/50 opacity-0 transition-opacity group-hover:opacity-100">
-              {i !== 0 && (
-                <button type="button" onClick={() => makeMain(i)} title="Tornar principal" className="rounded bg-white/90 p-1">
-                  <Star className="h-4 w-4 text-leather" />
-                </button>
+          <div key={img.publicId || i} className="group flex flex-col gap-1">
+            {/* Miniatura */}
+            <div className="relative aspect-square overflow-hidden rounded-xl border border-premium/15 bg-cream shadow-soft">
+              <Image src={img.url} alt={img.alt || ""} fill sizes="200px" className="object-cover" />
+              {i === 0 && (
+                <span className="absolute left-1 top-1 inline-flex items-center gap-1 rounded-full bg-champagne px-2 py-0.5 text-[10px] font-semibold text-ink">
+                  <Star className="h-2.5 w-2.5" /> Capa
+                </span>
               )}
-              <button type="button" onClick={() => remove(i)} title="Remover" className="rounded bg-white/90 p-1">
-                <X className="h-4 w-4 text-burgundy" />
-              </button>
+              {/* Botões hover */}
+              <div className="absolute inset-0 flex items-center justify-center gap-2 bg-leather/60 opacity-0 transition-opacity group-hover:opacity-100">
+                {i !== 0 && (
+                  <button type="button" onClick={() => makeMain(i)} title="Tornar capa" className="rounded-full bg-white/90 p-1.5 shadow hover:bg-champagne">
+                    <Star className="h-3.5 w-3.5 text-leather" />
+                  </button>
+                )}
+                <button type="button" onClick={() => startEdit(i)} title="Editar descrição" className="rounded-full bg-white/90 p-1.5 shadow hover:bg-champagne">
+                  <PencilLine className="h-3.5 w-3.5 text-leather" />
+                </button>
+                <button type="button" onClick={() => remove(i)} title="Remover" className="rounded-full bg-white/90 p-1.5 shadow hover:bg-burgundy/80">
+                  <X className="h-3.5 w-3.5 text-burgundy" />
+                </button>
+              </div>
             </div>
+
+            {/* Descrição / alt */}
+            {editingIdx === i ? (
+              <div className="flex gap-1">
+                <input
+                  autoFocus
+                  className="min-w-0 flex-1 rounded-lg border border-champagne px-2 py-1 text-xs outline-none"
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") saveEdit(i); if (e.key === "Escape") setEditingIdx(null); }}
+                  placeholder="Descrição da imagem..."
+                />
+                <button type="button" onClick={() => saveEdit(i)} className="rounded-lg bg-champagne px-2 py-1 text-xs text-ink hover:bg-champagne/80">
+                  <Check className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ) : (
+              <p
+                className="cursor-pointer truncate rounded px-1 text-xs text-ink/45 hover:text-ink/70"
+                onClick={() => startEdit(i)}
+                title="Clique para editar descrição"
+              >
+                {img.alt || <span className="italic">Sem descrição — clique para editar</span>}
+              </p>
+            )}
           </div>
         ))}
 
-        <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-premium/30 text-leather/50 hover:border-champagne hover:text-champagne">
-          {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}
-          <span className="text-xs">{uploading ? "Enviando..." : "Adicionar"}</span>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            disabled={uploading}
-            onChange={(e) => handleFiles(e.target.files)}
-          />
+        {/* Botão adicionar */}
+        <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-premium/25 text-leather/50 transition-colors hover:border-champagne hover:text-champagne">
+          {uploading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Upload className="h-6 w-6" />}
+          <span className="text-xs font-medium">{uploading ? "Enviando..." : "Adicionar"}</span>
+          <input type="file" accept="image/*" multiple className="hidden" disabled={uploading} onChange={(e) => handleFiles(e.target.files)} />
         </label>
       </div>
       {error && <p className="mt-2 text-xs text-burgundy">{error}</p>}

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { dbConnect } from "@/lib/mongodb";
 import { CatalogItem } from "@/models/CatalogItem";
 
-export type CatalogKind = "category" | "color" | "leather" | "size" | "segment";
+export type CatalogKind = "category" | "color" | "leather" | "size" | "segment" | "finish";
 
 export interface CatalogItemDTO {
   id: string;
@@ -102,4 +102,10 @@ export async function getProductFormOptions(): Promise<ProductFormOptions> {
 export async function listSegments(): Promise<string[]> {
   const segs = await listCatalogItems("segment");
   return segs.map((s) => s.name);
+}
+
+/* Lista de acabamentos (para o Briefing e Portfólio) */
+export async function listFinishes(): Promise<string[]> {
+  const fins = await listCatalogItems("finish");
+  return fins.map((f) => f.name);
 }

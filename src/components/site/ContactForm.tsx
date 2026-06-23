@@ -5,9 +5,7 @@ import { track } from "@/components/analytics/Analytics";
 
 type Status = "idle" | "sending" | "ok" | "error";
 
-const SEGMENTS = ["Restaurante", "Bar", "Hotel", "Motel", "Outro"];
-
-export function ContactForm() {
+export function ContactForm({ segmentOptions = [] }: { segmentOptions?: string[] }) {
   const [status, setStatus] = useState<Status>("idle");
   const [form, setForm] = useState({
     name: "",
@@ -102,10 +100,8 @@ export function ContactForm() {
           <label className="mb-1 block text-xs text-ink/60">Segmento</label>
           <select className={field} value={form.segment} onChange={upd("segment")}>
             <option value="">Selecione...</option>
-            {SEGMENTS.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
+            {segmentOptions.map((s) => (
+              <option key={s} value={s}>{s}</option>
             ))}
           </select>
         </div>

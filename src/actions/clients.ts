@@ -278,3 +278,19 @@ export async function deleteAllClients(): Promise<ActionResult<{ deleted: number
     return { ok: false, error: "Erro ao excluir os leads." };
   }
 }
+
+/* ─── Excluir leads selecionados ───────────────────────────── */
+export async function deleteSelectedClients(
+  ids: string[]
+): Promise<ActionResult<{ deleted: number }>> {
+  if (!ids.length) return { ok: false, error: "Nenhum lead selecionado." };
+  try {
+    await dbConnect();
+    const result = await Client.deleteMany({ _id: { $in: ids } });
+    revalidatePath("/admin/crm");
+    return { ok: true, data: { deleted: result.deletedCount } };
+  } catch (err) {
+    console.error("deleteSelectedClients:", err);
+    return { ok: false, error: "Erro ao excluir os leads selecionados." };
+  }
+}
