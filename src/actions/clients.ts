@@ -265,3 +265,16 @@ export async function importLeads(
     return { ok: false, error: "Erro ao importar os leads. Tente novamente." };
   }
 }
+
+/* ─── Excluir todos os leads ────────────────────────────────── */
+export async function deleteAllClients(): Promise<ActionResult<{ deleted: number }>> {
+  try {
+    await dbConnect();
+    const result = await Client.deleteMany({});
+    revalidatePath("/admin/crm");
+    return { ok: true, data: { deleted: result.deletedCount } };
+  } catch (err) {
+    console.error("deleteAllClients:", err);
+    return { ok: false, error: "Erro ao excluir os leads." };
+  }
+}

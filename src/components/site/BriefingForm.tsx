@@ -9,7 +9,6 @@ const inputCls =
   "w-full rounded-lg border border-leather/15 bg-white px-3.5 py-2.5 text-[15px] text-ink " +
   "outline-none transition-colors placeholder:text-ink/30 focus:border-champagne focus:ring-2 focus:ring-champagne/25";
 
-const SEGMENTS_OPT = ["Restaurante", "Bar", "Hotel", "Motel", "Cafeteria", "Pub", "Pizzaria", "Outro"];
 const STYLE_OPT = ["Sofisticado / Premium", "Casual", "Rústico", "Moderno", "Clássico", "Outro"];
 const BRANDING_OPT = ["Sim, já tenho logo", "Não tenho", "Está em criação"];
 const PROJECT_OPT = ["Nova criação", "Reformular cardápio existente", "Reimpressão"];
@@ -29,7 +28,7 @@ const EMPTY = {
   references: "", deadline: "", budget: "", notes: "", website: "",
 };
 
-export function BriefingForm() {
+export function BriefingForm({ segmentOptions = [] }: { segmentOptions?: string[] }) {
   const [pending, startTransition] = useTransition();
   const [form, setForm] = useState({ ...EMPTY });
   const [productTypes, setProductTypes] = useState<string[]>([]);
@@ -122,7 +121,16 @@ export function BriefingForm() {
       {/* 2. Sobre o estabelecimento */}
       <Section title="2. Sobre o estabelecimento" subtitle="Conte um pouco sobre o seu negócio.">
         <Field label="Segmento">
-          <Select value={form.segment} onChange={set("segment")} options={SEGMENTS_OPT} />
+          segmentOptions.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-leather/25 bg-cream/50 px-3.5 py-2.5 text-sm text-ink/60">
+              Nenhum segmento cadastrado.{" "}
+              <a href="/admin/catalogo" target="_blank" className="font-semibold text-champagne hover:underline">
+                Cadastrar no Catálogo
+              </a>
+            </div>
+          ) : (
+            <Select value={form.segment} onChange={set("segment")} options={segmentOptions} />
+          )
         </Field>
         <Field label="Estilo do estabelecimento">
           <Select value={form.style} onChange={set("style")} options={STYLE_OPT} />

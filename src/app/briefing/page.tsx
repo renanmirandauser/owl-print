@@ -1,6 +1,9 @@
 import { Navbar } from "@/components/site/Navbar";
 import { BriefingForm } from "@/components/site/BriefingForm";
+import { listSegments } from "@/actions/catalog";
 import type { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Briefing de Criação",
@@ -8,7 +11,9 @@ export const metadata: Metadata = {
     "Envie o briefing do seu projeto de cardápio personalizado e receba uma proposta sob medida da OWL PRINT.",
 };
 
-export default function BriefingPage() {
+export default async function BriefingPage() {
+  const segments = await listSegments();
+
   return (
     <main>
       <Navbar />
@@ -27,7 +32,7 @@ export default function BriefingPage() {
       </header>
 
       <div className="container max-w-3xl py-12">
-        <BriefingForm />
+        <BriefingForm segmentOptions={segments} />
       </div>
 
       <footer className="bg-ink py-8 text-center text-sm text-cream/50">

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Plus, Search, FileSpreadsheet } from "lucide-react";
 import { listClients } from "@/actions/clients";
 import { ClientStatusBadge } from "@/components/crm/ClientStatusBadge";
+import { DeleteAllLeadsButton } from "@/components/crm/DeleteAllLeadsButton";
 import { LEAD_STATUS, LEAD_STATUS_LABEL, type LeadStatus } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -20,11 +21,14 @@ export default async function CrmPage({
   const active = (TABS.find((t) => t.value === status)?.value ?? "all") as LeadStatus | "all";
   const clients = await listClients({ status: active, q });
 
+  // total geral (para o botão excluir todos — só sem filtros)
+  const allClients = active === "all" && !q ? clients : await listClients({});
+
   return (
     <div className="container py-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-3xl text-leather">CRM — Leads</h1>
-        <div className="flex gap-2">
+        <h1 className="font-display text-3xl font-bold text-leather">CRM — Leads</h1>
+        <div className="flex flex-wrap gap-2">
           <Link
             href="/admin/crm/importar"
             className="inline-flex items-center gap-2 rounded-lg border border-leather/20 px-4 py-2 text-sm font-medium text-leather transition-colors hover:bg-leather/5"
@@ -52,28 +56,35 @@ export default async function CrmPage({
         <button className="btn-gold !py-2 !px-4">Buscar</button>
       </form>
 
-      {/* Filtros */}
-      <div className="mt-4 flex flex-wrap gap-1 border-b border-premium/10">
-        {TABS.map((t) => {
-          const params = new URLSearchParams();
-          if (t.value !== "all") params.set("status", t.value);
-          if (q) params.set("q", q);
-          const qs = params.toString();
-          return (
-            <Link
-              key={t.value}
-              href={`/admin/crm${qs ? `?${qs}` : ""}`}
-              className={
-                "rounded-t-md px-4 py-2 text-sm transition-colors " +
-                (active === t.value
-                  ? "border-b-2 border-champagne font-medium text-leather"
-                  : "text-leather/50 hover:text-leather")
-              }
-            >
-              {t.label}
-            </Link>
-          );
-        })}
+      {/* Filtros de status */}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-b border-premium/10 pb-0">
+        <div className="flex flex-wrap gap-1">
+          {TABS.map((t) => {
+            const params = new URLSearchParams();
+            if (t.value !== "all") params.set("status", t.value);
+            if (q) params.set("q", q);
+            const qs = params.toString();
+            return (
+              <Link
+                key={t.value}
+                href={`/admin/crm${qs ? `?${qs}` : ""}`}
+                className={
+                  "rounded-t-md px-4 py-2 text-sm transition-colors " +
+                  (active === t.value
+                    ? "border-b-2 border-champagne font-semibold text-leather"
+                    : "text-leather/50 hover:text-leather")
+                }
+              >
+                {t.label}
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Botão excluir todos — só aparece na aba "Todos" sem filtro de busca */}
+        {active === "all" && !q && allClients.length > 0 && (
+          <DeleteAllLeadsButton count={allClients.length} />
+        )}
       </div>
 
       {/* Lista */}
@@ -87,32 +98,36 @@ export default async function CrmPage({
             .
           </div>
         ) : (
-          <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-sm">
-            <thead className="bg-cream/60 text-left text-xs uppercase tracking-wider text-leather/50">
-              <tr>
-                <th className="px-4 py-3">Nome</th>
-                <th className="px-4 py-3">Empresa</th>
-                <th className="px-4 py-3">Contato</th>
-                <th className="px-4 py-3">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-premium/10">
-              {clients.map((c) => (
-                <tr key={c.id} className="transition-colors hover:bg-cream/40">
-                  <td className="px-4 py-3">
-                    <Link href={`/admin/crm/${c.id}`} className="font-medium text-premium">
-                      {c.name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-leather">{c.company || "—"}</td>
-                  <td className="px-4 py-3 text-leather/60">{c.phone || c.whatsapp || c.email || "—"}</td>
-                  <td className="px-4 py-3">
-                    <ClientStatusBadge status={c.status} />
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-sm">
+              <thead className="bg-cream/60 text-left text-xs uppercase tracking-wider text-leather/50">
+                <tr>
+                  <th className="px-4 py-3">Nome</th>
+                  <th className="px-4 py-3">Empresa</th>
+                  <th className="px-4 py-3">Contato</th>
+                  <th className="px-4 py-3">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table></div>
+              </thead>
+              <tbody className="divide-y divide-premium/10">
+                {clients.map((c) => (
+                  <tr key={c.id} className="transition-colors hover:bg-cream/40">
+                    <td className="px-4 py-3">
+                      <Link href={`/admin/crm/${c.id}`} className="font-semibold text-premium">
+                        {c.name}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-leather">{c.company || "—"}</td>
+                    <td className="px-4 py-3 text-leather/60">
+                      {c.phone || c.whatsapp || c.email || "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <ClientStatusBadge status={c.status} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
