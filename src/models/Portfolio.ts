@@ -1,5 +1,4 @@
 import { Schema, model, models, type InferSchemaType } from "mongoose";
-import { SEGMENTS } from "@/types";
 
 const ImageSchema = new Schema(
   { url: { type: String, required: true }, publicId: String, alt: String },
@@ -11,7 +10,7 @@ const PortfolioSchema = new Schema(
     clientName: { type: String, required: true },
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true, index: true },
-    segment: { type: String, enum: SEGMENTS, index: true },
+    segment: { type: String, index: true },
     category: String,
     description: String,
     caseStudy: String,

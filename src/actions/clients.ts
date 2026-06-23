@@ -204,3 +204,64 @@ export async function deleteClient(id: string): Promise<ActionResult> {
     return { ok: false, error: "Erro ao excluir lead." };
   }
 }
+
+/* ─── Importação em massa (planilha Excel/CSV) ─────────────── */
+export interface ImportLeadRow {
+  name: string;
+  company?: string;
+  phone?: string;
+  whatsapp?: string;
+  instagram?: string;
+  email?: string;
+  notes?: string;
+}
+
+export async function importLeads(
+  rows: ImportLeadRow[]
+): Promise<{ ok: true; created: number; skipped: number } | { ok: false; error: string }> {
+  try {
+    await dbConnect();
+
+    const clean = (v?: string) => {
+      const t = (v ?? "").toString().trim();
+      return t.length ? t : undefined;
+    };
+
+    const docs: Record<string, unknown>[] = [];
+    let skipped = 0;
+
+    for (const r of rows) {
+      const name = clean(r.name);
+      if (!name) {
+        skipped++;
+        continue;
+      }
+      docs.push({
+        name,
+        company: clean(r.company),
+        phone: clean(r.phone),
+        whatsapp: clean(r.whatsapp),
+        instagram: clean(r.instagram),
+        email: clean(r.email)?.toLowerCase(),
+        notes: clean(r.notes),
+        status: "new" as LeadStatus,
+        source: "Importação Excel",
+        activities: [{ type: "status", content: "Importado da planilha", at: new Date() }],
+      });
+    }
+
+    if (docs.length === 0) {
+      return {
+        ok: false,
+        error: "Nenhum lead válido encontrado. Verifique se há uma coluna com o nome.",
+      };
+    }
+
+    await Client.insertMany(docs, { ordered: false });
+    revalidatePath("/admin/crm");
+    return { ok: true, created: docs.length, skipped };
+  } catch (err) {
+    console.error("importLeads:", err);
+    return { ok: false, error: "Erro ao importar os leads. Tente novamente." };
+  }
+}

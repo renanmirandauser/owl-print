@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, FileSpreadsheet } from "lucide-react";
 import { listClients } from "@/actions/clients";
 import { ClientStatusBadge } from "@/components/crm/ClientStatusBadge";
 import { LEAD_STATUS, LEAD_STATUS_LABEL, type LeadStatus } from "@/types";
@@ -22,11 +22,19 @@ export default async function CrmPage({
 
   return (
     <div className="container py-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-3xl text-leather">CRM — Leads</h1>
-        <Link href="/admin/crm/novo" className="btn-gold !py-2 !px-4">
-          <Plus className="h-4 w-4" /> Novo Lead
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/admin/crm/importar"
+            className="inline-flex items-center gap-2 rounded-lg border border-leather/20 px-4 py-2 text-sm font-medium text-leather transition-colors hover:bg-leather/5"
+          >
+            <FileSpreadsheet className="h-4 w-4" /> Importar Excel
+          </Link>
+          <Link href="/admin/crm/novo" className="btn-gold !py-2 !px-4">
+            <Plus className="h-4 w-4" /> Novo Lead
+          </Link>
+        </div>
       </div>
 
       {/* Busca */}

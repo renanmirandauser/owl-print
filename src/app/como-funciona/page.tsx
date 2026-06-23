@@ -35,10 +35,13 @@ export default function ComoFuncionaPage() {
   return (
     <main>
       <Navbar />
-      <div className="bg-leather py-16 text-center text-cream">
-        <h1 className="font-display text-4xl">Como Funciona</h1>
-        <p className="mt-2 text-cream/70">Do briefing à entrega, um processo simples e cuidadoso.</p>
-      </div>
+      <header className="border-b border-leather/10 bg-white">
+        <div className="container py-14 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-champagne">Processo</p>
+          <h1 className="mt-2 font-display text-4xl font-bold text-leather md:text-5xl">Como Funciona</h1>
+          <p className="mx-auto mt-3 max-w-xl text-ink/60">Do briefing à entrega, um processo simples e cuidadoso.</p>
+        </div>
+      </header>
 
       <section className="container py-16">
         <div className="grid gap-6 md:grid-cols-2">

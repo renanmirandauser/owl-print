@@ -12,7 +12,7 @@ const CatalogItemSchema = new Schema(
   {
     kind: {
       type: String,
-      enum: ["category", "color", "leather", "size"],
+      enum: ["category", "color", "leather", "size", "segment"],
       required: true,
       index: true,
     },

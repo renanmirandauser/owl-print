@@ -3,9 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { dbConnect } from "@/lib/mongodb";
 import { CatalogItem } from "@/models/CatalogItem";
-import { PRODUCT_CATEGORIES, CATEGORY_LABEL } from "@/types";
 
-export type CatalogKind = "category" | "color" | "leather" | "size";
+export type CatalogKind = "category" | "color" | "leather" | "size" | "segment";
 
 export interface CatalogItemDTO {
   id: string;
@@ -56,6 +55,7 @@ export async function createCatalogItem(input: {
     });
 
     revalidatePath("/admin/catalogo");
+    revalidatePath("/admin/portfolio");
     return { ok: true };
   } catch (err) {
     console.error("createCatalogItem:", err);
@@ -98,38 +98,8 @@ export async function getProductFormOptions(): Promise<ProductFormOptions> {
   };
 }
 
-/* Importa as 7 categorias padrão para a lista editável (sem duplicar) */
-export async function seedDefaultCategories(): Promise<
-  { ok: true; added: number } | { ok: false; error: string }
-> {
-  try {
-    await dbConnect();
-    const existing = new Set(
-      (await listCatalogItems("category")).map((c) => c.name.toLowerCase())
-    );
-    let added = 0;
-    for (const c of PRODUCT_CATEGORIES) {
-      const label = CATEGORY_LABEL[c];
-      if (!existing.has(label.toLowerCase())) {
-        await CatalogItem.create({ kind: "category", name: label });
-        added++;
-      }
-    }
-    revalidatePath("/admin/catalogo");
-    revalidatePath("/");
-    revalidatePath("/produtos");
-    return { ok: true, added };
-  } catch (err) {
-    console.error("seedDefaultCategories:", err);
-    return { ok: false, error: "Erro ao importar." };
-  }
-}
-
-/* Lista unificada de categorias para exibição (padrões + cadastradas, sem repetir) */
-export async function listDisplayCategories(): Promise<{ value: string; label: string }[]> {
-  const managed = await listCatalogItems("category");
-  const defaults = PRODUCT_CATEGORIES.map((c) => ({ value: c as string, label: CATEGORY_LABEL[c] }));
-  const managedMapped = managed.map((m) => ({ value: m.name, label: m.name }));
-  const all = [...defaults, ...managedMapped];
-  return all.filter((c, i, arr) => arr.findIndex((x) => x.label === c.label) === i);
+/* Lista de segmentos (para o Portfólio) */
+export async function listSegments(): Promise<string[]> {
+  const segs = await listCatalogItems("segment");
+  return segs.map((s) => s.name);
 }

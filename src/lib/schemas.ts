@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { SEGMENTS, type Segment } from "@/types";
 
 /* Imagem (Cloudinary) — usada por produtos e portfólio */
 export const imageSchema = z.object({
@@ -68,7 +67,7 @@ export const productSchema = z.object({
 export const portfolioSchema = z.object({
   title: z.string().min(2, "Informe o título"),
   clientName: z.string().min(2, "Informe o cliente"),
-  segment: z.string().refine((v) => SEGMENTS.includes(v as Segment), "Segmento inválido"),
+  segment: z.string().min(1, "Informe o segmento"),
   category: z.string().optional(),
   description: z.string().optional(),
   caseStudy: z.string().optional(),
@@ -93,4 +92,36 @@ export const quoteSchema = z.object({
   validUntil: z.string().optional(), // ISO yyyy-mm-dd
   notes: z.string().optional(),
   items: z.array(itemSchema).min(1, "Adicione ao menos 1 produto"),
+});
+
+/* Briefing — solicitação de criação enviada pelo cliente (site) */
+export const briefingSchema = z.object({
+  // contato
+  responsible: z.string().min(2, "Informe seu nome"),
+  company: z.string().min(2, "Informe o nome do estabelecimento"),
+  whatsapp: z.string().min(8, "Informe um WhatsApp para contato"),
+  email: z.string().email("E-mail inválido").optional().or(z.literal("")),
+  instagram: z.string().optional(),
+  city: z.string().optional(),
+  // estabelecimento
+  segment: z.string().optional(),
+  style: z.string().optional(),
+  audience: z.string().optional(),
+  hasBranding: z.string().optional(),
+  // projeto
+  projectType: z.string().optional(),
+  productTypes: z.array(z.string()).default([]),
+  quantity: z.string().optional(),
+  size: z.string().optional(),
+  colorPreference: z.string().optional(),
+  finishes: z.array(z.string()).default([]),
+  logoPosition: z.string().optional(),
+  pages: z.string().optional(),
+  languages: z.string().optional(),
+  contentReady: z.string().optional(),
+  // referências e prazo
+  references: z.string().optional(),
+  deadline: z.string().optional(),
+  budget: z.string().optional(),
+  notes: z.string().optional(),
 });

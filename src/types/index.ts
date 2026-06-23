@@ -45,6 +45,27 @@ export const SEGMENT_LABEL: Record<Segment, string> = {
   motel: "Motel",
 };
 
+/** Rótulo do segmento: usa o mapa antigo para slugs legados; senão, o próprio texto. */
+export const segmentLabel = (s: string): string =>
+  (SEGMENT_LABEL as Record<string, string>)[s] ?? s;
+
+export const BRIEFING_STATUS = ["new", "reviewing", "quoted", "archived"] as const;
+export type BriefingStatus = (typeof BRIEFING_STATUS)[number];
+
+export const BRIEFING_STATUS_LABEL: Record<BriefingStatus, string> = {
+  new: "Novo",
+  reviewing: "Em análise",
+  quoted: "Orçado",
+  archived: "Arquivado",
+};
+
+export const BRIEFING_STATUS_COLOR: Record<BriefingStatus, string> = {
+  new: "bg-champagne/25 text-premium",
+  reviewing: "bg-blue-100 text-blue-700",
+  quoted: "bg-emerald-100 text-emerald-700",
+  archived: "bg-leather/10 text-leather/60",
+};
+
 export const FINANCIAL_KIND = ["revenue", "expense"] as const;
 export type FinancialKind = (typeof FINANCIAL_KIND)[number];
 

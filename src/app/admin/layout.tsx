@@ -14,6 +14,7 @@ import {
   Images,
   Palette,
   Building2,
+  ClipboardList,
   Store,
   LogOut,
   Menu,
@@ -28,6 +29,7 @@ const GROUPS = [
       { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
       { href: "/admin/orcamentos", label: "Orçamentos", icon: FileText },
       { href: "/admin/crm", label: "CRM", icon: Users },
+      { href: "/admin/briefings", label: "Briefings", icon: ClipboardList },
       { href: "/admin/producao", label: "Produção", icon: KanbanSquare },
       { href: "/admin/financeiro", label: "Financeiro", icon: Wallet },
     ],
@@ -84,7 +86,7 @@ function NavContent({
       <nav className="flex-1 space-y-6">
         {GROUPS.map((g) => (
           <div key={g.label}>
-            <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-ink/40">
+            <p className="mb-2 px-3 text-[11px] font-bold uppercase tracking-wider text-ink/40">
               {g.label}
             </p>
             <div className="space-y-1">
@@ -95,13 +97,13 @@ function NavContent({
                     key={href}
                     href={href}
                     onClick={onNavigate}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                       active
-                        ? "bg-champagne/15 font-semibold text-leather"
+                        ? "bg-leather text-cream shadow-soft"
                         : "text-ink/70 hover:bg-leather/5 hover:text-leather"
                     }`}
                   >
-                    <Icon className={`h-4 w-4 ${active ? "text-champagne" : ""}`} />
+                    <Icon className={`h-[18px] w-[18px] ${active ? "text-champagne" : "text-ink/50"}`} />
                     {label}
                   </Link>
                 );

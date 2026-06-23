@@ -1,29 +1,25 @@
 import { CatalogManager } from "@/components/admin/CatalogManager";
 import { listCatalogItems } from "@/actions/catalog";
-import { SeedDefaultsButton } from "@/components/admin/SeedDefaultsButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function CatalogoPage() {
-  const [categories, colors, leathers, sizes] = await Promise.all([
+  const [categories, colors, leathers, sizes, segments] = await Promise.all([
     listCatalogItems("category"),
     listCatalogItems("color"),
     listCatalogItems("leather"),
     listCatalogItems("size"),
+    listCatalogItems("segment"),
   ]);
 
   return (
     <div className="container py-8">
-      <div className="mb-6">
+      <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-leather">Catálogo</h1>
-        <p className="mt-1 text-ink/60">
-          Cadastre as opções que serão usadas nos produtos e na Loja: categorias, cores,
-          tipos de couro e tamanhos.
+        <p className="mt-2 text-[15px] text-ink/70">
+          Cadastre as opções usadas nos produtos, na Loja e no Portfólio: categorias, cores,
+          tipos de couro, tamanhos e segmentos.
         </p>
-      </div>
-
-      <div className="mb-6">
-        <SeedDefaultsButton />
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
@@ -45,7 +41,7 @@ export default async function CatalogoPage() {
         <CatalogManager
           kind="leather"
           title="Tipos de Couro"
-          description="Paleta de couros (ex.: Couro Sintético, Couro Legítimo)."
+          description="Tipos de couro (ex.: Couro Sintético, Couro Legítimo)."
           items={leathers}
           placeholder="Ex.: Couro Sintético"
         />
@@ -56,13 +52,14 @@ export default async function CatalogoPage() {
           items={sizes}
           placeholder="Ex.: A4 (21x30cm)"
         />
+        <CatalogManager
+          kind="segment"
+          title="Segmentos"
+          description="Segmentos de cliente para o Portfólio (ex.: Restaurante, Bar, Hotel, Motel, Pub)."
+          items={segments}
+          placeholder="Ex.: Restaurante"
+        />
       </div>
-
-      <p className="mt-6 rounded-lg border border-champagne/30 bg-champagne/10 p-4 text-sm text-ink/70">
-        <strong>Próximo passo:</strong> depois que você cadastrar suas opções aqui, eu conecto
-        essas listas ao formulário de produto e à Loja (Etapa 2), para que apareçam
-        automaticamente ao cadastrar produtos.
-      </p>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Navbar } from "@/components/site/Navbar";
 import { getPortfolioBySlug } from "@/actions/portfolio";
-import { SEGMENT_LABEL } from "@/types";
+import { segmentLabel } from "@/types";
 
 export const dynamic = "force-dynamic";
 
@@ -47,7 +47,7 @@ export default async function CaseStudyPage({
 
         <div className="mt-6 max-w-3xl">
           <span className="text-xs uppercase tracking-wider text-champagne">
-            {SEGMENT_LABEL[p.segment]}
+            {segmentLabel(p.segment)}
             {p.category ? ` • ${p.category}` : ""}
           </span>
           <h1 className="mt-1 font-display text-4xl text-leather">{p.title}</h1>

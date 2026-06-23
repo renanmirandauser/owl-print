@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Plus, Star, Pencil } from "lucide-react";
 import { listPortfolio } from "@/actions/portfolio";
-import { SEGMENT_LABEL } from "@/types";
+import { segmentLabel } from "@/types";
 import { DeletePortfolioButton } from "@/components/portfolio/PortfolioForm";
 
 export const dynamic = "force-dynamic";
@@ -39,7 +39,7 @@ export default async function AdminPortfolioPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-leather/70">{p.clientName}</td>
-                  <td className="px-4 py-3 text-leather/70">{SEGMENT_LABEL[p.segment]}</td>
+                  <td className="px-4 py-3 text-leather/70">{segmentLabel(p.segment)}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-3">
                       <Link href={`/admin/portfolio/${p.id}/editar`} className="text-leather/40 hover:text-premium" aria-label="Editar"><Pencil className="h-4 w-4" /></Link>

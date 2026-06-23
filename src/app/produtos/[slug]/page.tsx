@@ -42,7 +42,7 @@ export default async function ProductPage({
     "@type": "Product",
     name: p.name,
     description: p.description,
-    category: CATEGORY_LABEL[p.category],
+    category: CATEGORY_LABEL[p.category] ?? p.category,
     image: p.gallery.map((g) => g.url),
     brand: { "@type": "Brand", name: "OWL PRINT" },
   };
@@ -80,7 +80,7 @@ export default async function ProductPage({
 
           {/* Info */}
           <div>
-            <span className="text-xs uppercase tracking-wider text-champagne">{CATEGORY_LABEL[p.category]}</span>
+            <span className="text-xs uppercase tracking-wider text-champagne">{CATEGORY_LABEL[p.category] ?? p.category}</span>
             <h1 className="mt-1 font-display text-4xl text-leather">{p.name}</h1>
             {p.description && <p className="mt-4 text-leather/70">{p.description}</p>}
 

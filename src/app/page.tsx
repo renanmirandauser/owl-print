@@ -4,7 +4,7 @@ import { ProductCard } from "@/components/products/ProductCard";
 import Link from "next/link";
 import { PartnersCarousel } from "@/components/site/PartnersCarousel";
 import { listPartners } from "@/actions/partners";
-import { listDisplayCategories } from "@/actions/catalog";
+import { listCatalog } from "@/actions/products";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +35,7 @@ const DIFFERENTIALS = [
 
 export default async function HomePage() {
   const partners = await listPartners();
-  const categories = await listDisplayCategories();
+  const products = await listCatalog();
   return (
     <main>
       <Navbar />
@@ -53,37 +53,39 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Produtos */}
-      <section className="container py-20">
-        <div className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-champagne">
-            Nosso catálogo
-          </p>
-          <h2 className="mt-2 font-display text-4xl font-bold text-leather">Nossos Produtos</h2>
-          <p className="mx-auto mt-3 max-w-xl text-ink/60">
-            Soluções completas e personalizadas para elevar a experiência do seu cliente —
-            do cardápio aos detalhes da mesa.
-          </p>
-        </div>
+      {/* Produtos — só aparecem se houver produtos cadastrados */}
+      {products.length > 0 && (
+        <section className="container py-20">
+          <div className="text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-champagne">
+              Nosso catálogo
+            </p>
+            <h2 className="mt-2 font-display text-4xl font-bold text-leather">Nossos Produtos</h2>
+            <p className="mx-auto mt-3 max-w-xl text-ink/60">
+              Soluções completas e personalizadas para elevar a experiência do seu cliente —
+              do cardápio aos detalhes da mesa.
+            </p>
+          </div>
 
-        <div className="mt-12 grid grid-cols-2 gap-5 md:grid-cols-4">
-          {categories.map((c) => (
-            <ProductCard
-              key={c.label}
-              slug={c.value}
-              category={c.value}
-              name={c.label}
-              href="/produtos"
-            />
-          ))}
-        </div>
+          <div className="mt-12 grid grid-cols-2 gap-5 md:grid-cols-4">
+            {products.slice(0, 8).map((p) => (
+              <ProductCard
+                key={p.id}
+                slug={p.slug}
+                category={p.category}
+                name={p.name}
+                image={p.gallery[0]?.url}
+              />
+            ))}
+          </div>
 
-        <div className="mt-10 text-center">
-          <Link href="/loja" className="btn-gold">
-            Montar meu orçamento na Loja
-          </Link>
-        </div>
-      </section>
+          <div className="mt-10 text-center">
+            <Link href="/produtos" className="btn-outline">
+              Ver todos os produtos
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Como funciona */}
       <section className="bg-white py-20">

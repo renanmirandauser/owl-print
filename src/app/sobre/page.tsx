@@ -18,10 +18,13 @@ export default function SobrePage() {
   return (
     <main>
       <Navbar />
-      <div className="bg-leather py-16 text-center text-cream">
-        <h1 className="font-display text-4xl">Sobre Nós</h1>
-        <p className="mt-2 text-cream/70">Mais do que cardápios — criamos experiências.</p>
-      </div>
+      <header className="border-b border-leather/10 bg-white">
+        <div className="container py-14 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-champagne">A OWL PRINT</p>
+          <h1 className="mt-2 font-display text-4xl font-bold text-leather md:text-5xl">Sobre Nós</h1>
+          <p className="mx-auto mt-3 max-w-xl text-ink/60">Mais do que cardápios — criamos experiências.</p>
+        </div>
+      </header>
 
       <section className="container grid gap-10 py-16 md:grid-cols-2 md:items-center">
         <div>

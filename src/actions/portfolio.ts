@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { dbConnect } from "@/lib/mongodb";
 import { Portfolio } from "@/models/Portfolio";
 import { slugify } from "@/lib/utils";
-import { type Segment, type CloudinaryImage } from "@/types";
+import { type CloudinaryImage } from "@/types";
 import { portfolioSchema } from "@/lib/schemas";
 
 export type PortfolioInput = z.infer<typeof portfolioSchema>;
@@ -14,7 +14,7 @@ export interface PortfolioDTO {
   id: string;
   title: string;
   clientName: string;
-  segment: Segment;
+  segment: string;
   category: string;
   description: string;
   caseStudy: string;
@@ -27,7 +27,7 @@ type LeanItem = {
   _id: unknown;
   title: string;
   clientName: string;
-  segment: Segment;
+  segment: string;
   category?: string;
   description?: string;
   caseStudy?: string;
@@ -68,7 +68,7 @@ async function uniqueSlug(base: string, ignoreId?: string): Promise<string> {
   }
 }
 
-export async function listPortfolio(segment?: Segment | "all"): Promise<PortfolioDTO[]> {
+export async function listPortfolio(segment?: string): Promise<PortfolioDTO[]> {
   try {
     await dbConnect();
     const filter = segment && segment !== "all" ? { segment } : {};

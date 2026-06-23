@@ -26,10 +26,13 @@ export default function ContatoPage() {
   return (
     <main>
       <Navbar />
-      <div className="bg-leather py-16 text-center text-cream">
-        <h1 className="font-display text-4xl">Fale Conosco</h1>
-        <p className="mt-2 text-cream/70">Vamos criar algo memorável para o seu negócio.</p>
-      </div>
+      <header className="border-b border-leather/10 bg-white">
+        <div className="container py-14 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-champagne">Contato</p>
+          <h1 className="mt-2 font-display text-4xl font-bold text-leather md:text-5xl">Fale Conosco</h1>
+          <p className="mx-auto mt-3 max-w-xl text-ink/60">Vamos criar algo memorável para o seu negócio.</p>
+        </div>
+      </header>
 
       <div className="container grid gap-8 py-14 md:grid-cols-[1fr_1.2fr]">
         <div>
