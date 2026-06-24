@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, MessageSquare, Mail, Instagram, MapPin } from "lucide-react";
+import { ArrowLeft, MessageSquare, MessageCircle, Mail, Instagram, MapPin, Download } from "lucide-react";
 import { getBriefing } from "@/actions/briefings";
+import { briefingWhatsAppHref } from "@/lib/briefing-share";
 import {
   BRIEFING_STATUS_LABEL,
   BRIEFING_STATUS_COLOR,
@@ -22,7 +23,7 @@ export default async function BriefingDetailPage({
   const b = await getBriefing(id);
   if (!b) notFound();
 
-  const waNumber = b.whatsapp ? b.whatsapp.replace(/\D/g, "") : "";
+  const waHref = briefingWhatsAppHref(b);
 
   return (
     <div className="container max-w-4xl py-8">
@@ -49,14 +50,21 @@ export default async function BriefingDetailPage({
       <div className="mt-5 rounded-2xl border border-leather/10 bg-white p-4 shadow-soft">
         <BriefingStatusControl id={b.id} status={b.status} />
         <div className="mt-4 flex flex-wrap gap-2 border-t border-leather/10 pt-4">
-          {waNumber && (
+          <Link
+            href={`/admin/briefings/${b.id}/imprimir`}
+            target="_blank"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-premium/20 px-4 py-2 text-sm font-medium text-leather transition-colors hover:bg-cream"
+          >
+            <Download className="h-4 w-4 text-champagne" /> Baixar briefing
+          </Link>
+          {waHref && (
             <a
-              href={`https://wa.me/${waNumber}`}
+              href={waHref}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-gold !py-2 !px-4"
             >
-              <MessageSquare className="h-4 w-4" /> Falar no WhatsApp
+              <MessageSquare className="h-4 w-4" /> Enviar por WhatsApp
             </a>
           )}
           <DeleteBriefingButton id={b.id} />
@@ -67,7 +75,7 @@ export default async function BriefingDetailPage({
         <Card title="Contato">
           <Row label="Responsável" value={b.responsible} />
           <Row label="Estabelecimento" value={b.company} />
-          <Row label="WhatsApp" value={b.whatsapp} icon={MessageSquare} />
+          <Row label="WhatsApp" value={b.whatsapp} icon={MessageCircle} />
           <Row label="E-mail" value={b.email} icon={Mail} />
           <Row label="Instagram" value={b.instagram} icon={Instagram} />
           <Row label="Cidade / Estado" value={b.city} icon={MapPin} />

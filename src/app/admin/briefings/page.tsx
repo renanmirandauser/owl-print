@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Download, MessageCircle } from "lucide-react";
 import { listBriefings } from "@/actions/briefings";
+import { briefingWhatsAppHref } from "@/lib/briefing-share";
 import {
   BRIEFING_STATUS,
   BRIEFING_STATUS_LABEL,
@@ -56,7 +58,7 @@ export default async function BriefingsPage({
           <div className="p-12 text-center text-leather/50">Nenhum briefing recebido ainda.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-sm">
+            <table className="w-full min-w-[820px] text-sm">
               <thead className="bg-cream/60 text-left text-xs uppercase tracking-wider text-leather/50">
                 <tr>
                   <th className="px-4 py-3">Estabelecimento</th>
@@ -65,27 +67,69 @@ export default async function BriefingsPage({
                   <th className="px-4 py-3">Tipo</th>
                   <th className="px-4 py-3">Recebido</th>
                   <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 text-right">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-premium/10">
-                {items.map((b) => (
-                  <tr key={b.id} className="transition-colors hover:bg-cream/40">
-                    <td className="px-4 py-3">
-                      <Link href={`/admin/briefings/${b.id}`} className="font-semibold text-premium">
-                        {b.company}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 text-leather">{b.responsible}</td>
-                    <td className="px-4 py-3 text-leather/60">{b.whatsapp || "—"}</td>
-                    <td className="px-4 py-3 text-leather/60">{b.projectType || "—"}</td>
-                    <td className="px-4 py-3 text-leather/60">{fmtDate(b.createdAt)}</td>
-                    <td className="px-4 py-3">
-                      <span className={"rounded-full px-2.5 py-0.5 text-xs font-medium " + BRIEFING_STATUS_COLOR[b.status]}>
-                        {BRIEFING_STATUS_LABEL[b.status]}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {items.map((b) => {
+                  const waHref = briefingWhatsAppHref(b);
+                  return (
+                    <tr key={b.id} className="transition-colors hover:bg-cream/40">
+                      <td className="px-4 py-3">
+                        <Link
+                          href={`/admin/briefings/${b.id}`}
+                          className="font-semibold text-premium hover:underline"
+                        >
+                          {b.company}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3 text-leather">{b.responsible}</td>
+                      <td className="px-4 py-3 text-leather/60">{b.whatsapp || "—"}</td>
+                      <td className="px-4 py-3 text-leather/60">{b.projectType || "—"}</td>
+                      <td className="px-4 py-3 text-leather/60">{fmtDate(b.createdAt)}</td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={
+                            "rounded-full px-2.5 py-0.5 text-xs font-medium " +
+                            BRIEFING_STATUS_COLOR[b.status]
+                          }
+                        >
+                          {BRIEFING_STATUS_LABEL[b.status]}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            href={`/admin/briefings/${b.id}/imprimir`}
+                            target="_blank"
+                            title="Baixar briefing (PDF)"
+                            className="inline-flex items-center gap-1.5 rounded-md border border-premium/20 px-2.5 py-1.5 text-xs font-medium text-leather transition-colors hover:bg-cream"
+                          >
+                            <Download className="h-3.5 w-3.5 text-champagne" />
+                            Baixar
+                          </Link>
+                          {waHref ? (
+                            <a
+                              href={waHref}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="Enviar resumo do briefing pelo WhatsApp"
+                              className="inline-flex items-center gap-1.5 rounded-md border border-premium/20 px-2.5 py-1.5 text-xs font-medium text-leather transition-colors hover:bg-cream"
+                            >
+                              <MessageCircle className="h-3.5 w-3.5 text-emerald-600" />
+                              WhatsApp
+                            </a>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 rounded-md border border-premium/10 px-2.5 py-1.5 text-xs font-medium text-leather/30">
+                              <MessageCircle className="h-3.5 w-3.5" />
+                              WhatsApp
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
