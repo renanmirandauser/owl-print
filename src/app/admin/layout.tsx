@@ -12,6 +12,7 @@ import {
   Wallet,
   Package,
   Images,
+  Library,
   Palette,
   Building2,
   ClipboardList,
@@ -39,6 +40,7 @@ const GROUPS = [
     items: [
       { href: "/admin/produtos", label: "Produtos", icon: Package },
       { href: "/admin/portfolio", label: "Portfólio", icon: Images },
+      { href: "/admin/biblioteca", label: "Biblioteca", icon: Library },
       { href: "/admin/catalogo", label: "Categorias & Cores", icon: Palette },
       { href: "/admin/parceiros", label: "Parceiros", icon: Building2 },
       { href: "/admin/loja", label: "Textos da Loja", icon: Store },

@@ -112,7 +112,7 @@ export function PortfolioForm({
       <section className="rounded-2xl border border-leather/10 bg-white p-6 shadow-soft">
         <h2 className="mb-1 font-display text-lg font-semibold text-leather">Imagens do projeto</h2>
         <p className="mb-4 text-sm text-ink/55">A primeira imagem é usada como capa do case.</p>
-        <ImageUploader value={images} onChange={setImages} />
+        <ImageUploader value={images} onChange={setImages} enableLibrary />
       </section>
 
       {error && (

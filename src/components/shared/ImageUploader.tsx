@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Upload, X, Loader2, Star, PencilLine, Check } from "lucide-react";
+import { Upload, X, Loader2, Star, PencilLine, Check, Images } from "lucide-react";
 import type { CloudinaryImage } from "@/types";
+import { MediaLibraryPicker } from "@/components/shared/MediaLibraryPicker";
+import { registerMedia } from "@/actions/media";
 
 const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
@@ -11,13 +13,19 @@ const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 interface Props {
   value: CloudinaryImage[];
   onChange: (images: CloudinaryImage[]) => void;
+  /**
+   * Quando true, exibe o botão "Escolher da biblioteca" e registra os
+   * uploads novos no banco central de imagens. Padrão: false.
+   */
+  enableLibrary?: boolean;
 }
 
-export function ImageUploader({ value, onChange }: Props) {
+export function ImageUploader({ value, onChange, enableLibrary = false }: Props) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [editText, setEditText] = useState("");
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   async function handleFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
@@ -36,11 +44,22 @@ export function ImageUploader({ value, onChange }: Props) {
         uploaded.push({ url: data.secure_url, publicId: data.public_id });
       }
       onChange([...value, ...uploaded]);
+      // Alimenta o banco central de imagens (sem duplicar — upsert por publicId).
+      if (enableLibrary) {
+        registerMedia(uploaded.map((u) => ({ url: u.url, publicId: u.publicId }))).catch(() => {});
+      }
     } catch {
       setError("Falha no upload de uma ou mais imagens.");
     } finally {
       setUploading(false);
     }
+  }
+
+  function addFromLibrary(imgs: CloudinaryImage[]) {
+    const existing = new Set(value.map((v) => v.publicId).filter(Boolean));
+    const novas = imgs.filter((i) => !i.publicId || !existing.has(i.publicId));
+    if (novas.length) onChange([...value, ...novas]);
+    setPickerOpen(false);
   }
 
   function remove(i: number) { onChange(value.filter((_, idx) => idx !== i)); }
@@ -60,6 +79,19 @@ export function ImageUploader({ value, onChange }: Props) {
 
   return (
     <div>
+      {enableLibrary && (
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
+            className="inline-flex items-center gap-2 rounded-lg border border-champagne/60 bg-champagne/10 px-3.5 py-2 text-sm font-semibold text-premium transition-colors hover:bg-champagne/20"
+          >
+            <Images className="h-4 w-4" /> Escolher da biblioteca
+          </button>
+          <span className="text-xs text-ink/45">ou envie novas imagens abaixo (entram na biblioteca automaticamente).</span>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {value.map((img, i) => (
           <div key={img.publicId || i} className="group flex flex-col gap-1">
@@ -122,6 +154,14 @@ export function ImageUploader({ value, onChange }: Props) {
         </label>
       </div>
       {error && <p className="mt-2 text-xs text-burgundy">{error}</p>}
+
+      {pickerOpen && (
+        <MediaLibraryPicker
+          existingPublicIds={value.map((v) => v.publicId || "").filter(Boolean)}
+          onClose={() => setPickerOpen(false)}
+          onConfirm={addFromLibrary}
+        />
+      )}
     </div>
   );
 }

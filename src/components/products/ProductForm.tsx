@@ -145,7 +145,7 @@ export function ProductForm({
       <section className="rounded-2xl border border-leather/10 bg-white p-6 shadow-soft">
         <h2 className="mb-1 font-display text-lg font-semibold text-leather">Galeria de imagens</h2>
         <p className="mb-4 text-sm text-ink/55">A primeira imagem é usada como capa do produto.</p>
-        <ImageUploader value={gallery} onChange={setGallery} />
+        <ImageUploader value={gallery} onChange={setGallery} enableLibrary />
       </section>
 
       <section className="grid gap-5 rounded-2xl border border-leather/10 bg-white p-6 shadow-soft sm:grid-cols-2">
