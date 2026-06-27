@@ -6,6 +6,8 @@ import { ClientStatusBadge } from "@/components/crm/ClientStatusBadge";
 import { ClientPipeline } from "@/components/crm/ClientPipeline";
 import { ActivityTimeline } from "@/components/crm/ActivityTimeline";
 import { ClientActions } from "@/components/crm/ClientActions";
+import { listTemplates } from "@/actions/communications";
+import { SendWhatsAppButton } from "@/components/crm/SendWhatsAppButton";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +19,7 @@ export default async function ClientDetailPage({
   const { id } = await params;
   const c = await getClient(id);
   if (!c) notFound();
+  const templates = await listTemplates();
 
   return (
     <div className="container max-w-4xl py-8">
@@ -72,6 +75,7 @@ export default async function ClientDetailPage({
                 <Pencil className="h-4 w-4" /> Editar
               </Link>
               <ClientActions id={c.id} whatsapp={c.whatsapp || c.phone} />
+              <SendWhatsAppButton clientId={c.id} templates={templates} />
             </div>
           </div>
         </div>
