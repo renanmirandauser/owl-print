@@ -17,7 +17,7 @@ const INSTANCE_TOKEN = process.env.ZAPI_INSTANCE_TOKEN;
 const CLIENT_TOKEN = process.env.ZAPI_CLIENT_TOKEN;
 
 export function zapiConfigurado(): boolean {
-  return Boolean(INSTANCE_ID && INSTANCE_TOKEN && CLIENT_TOKEN);
+  return Boolean(INSTANCE_ID && INSTANCE_TOKEN);
 }
 
 function baseUrl(): string {
@@ -63,12 +63,12 @@ export async function enviarTexto(
   }
 
   try {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (CLIENT_TOKEN) headers["Client-Token"] = CLIENT_TOKEN;
+
     const res = await fetch(`${baseUrl()}/send-text`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Client-Token": CLIENT_TOKEN as string,
-      },
+      headers,
       body: JSON.stringify(body),
       // Evita cache em ambiente serverless.
       cache: "no-store",
