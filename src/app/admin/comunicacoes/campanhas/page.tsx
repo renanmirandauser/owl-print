@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye } from "lucide-react";
 import { listTemplates, listCampaigns } from "@/actions/communications";
 import { NovaCampanhaForm } from "./NovaCampanhaForm";
 
@@ -19,7 +19,7 @@ export default async function CampanhasPage() {
           <ArrowLeft className="h-4 w-4" /> Comunicações
         </Link>
         <h1 className="text-2xl font-semibold text-leather">Campanhas</h1>
-        <p className="text-sm text-leather/60">Envio em massa pela Z-API</p>
+        <p className="text-sm text-leather/60">Envio em massa e agendado pela Z-API</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -42,8 +42,8 @@ export default async function CampanhasPage() {
                   <tr className="text-left text-leather/60">
                     <th className="py-2 pr-4 font-medium">Campanha</th>
                     <th className="py-2 pr-4 font-medium">Enviadas</th>
-                    <th className="py-2 pr-4 font-medium">Falhas</th>
-                    <th className="py-2 font-medium">Status</th>
+                    <th className="py-2 pr-4 font-medium">Status</th>
+                    <th className="py-2 font-medium"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -51,8 +51,13 @@ export default async function CampanhasPage() {
                     <tr key={c.id} className="border-t border-premium/10">
                       <td className="py-2 pr-4 font-medium text-leather">{c.name}</td>
                       <td className="py-2 pr-4 text-leather/70">{c.sent}/{c.total}</td>
-                      <td className="py-2 pr-4 text-leather/70">{c.failed}</td>
-                      <td className="py-2 text-leather/70">{STATUS_LABEL[c.status] ?? c.status}</td>
+                      <td className="py-2 pr-4 text-leather/70">{STATUS_LABEL[c.status] ?? c.status}</td>
+                      <td className="py-2 text-right">
+                        <Link href={`/admin/comunicacoes/campanhas/${c.id}`}
+                          className="inline-flex items-center gap-1 text-xs font-medium text-leather hover:underline">
+                          <Eye className="h-3.5 w-3.5" /> Acompanhar
+                        </Link>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

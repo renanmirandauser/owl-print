@@ -20,7 +20,7 @@ const CommunicationLogSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["queued", "sent", "delivered", "read", "failed"],
+      enum: ["queued", "sending", "sent", "delivered", "read", "failed"],
       default: "queued",
       index: true,
     },

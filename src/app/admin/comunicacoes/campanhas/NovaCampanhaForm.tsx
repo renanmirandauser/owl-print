@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Send, Loader2, CheckCircle2 } from "lucide-react";
-import { createAndSendCampaign, type TemplateDTO } from "@/actions/communications";
+import { Send, Calendar, Loader2 } from "lucide-react";
+import { scheduleCampaign } from "@/actions/campaign-queue";
+import { type TemplateDTO } from "@/actions/communications";
 import { LEAD_STATUS, LEAD_STATUS_LABEL } from "@/types";
 
 export function NovaCampanhaForm({ templates }: { templates: TemplateDTO[] }) {
@@ -15,29 +16,36 @@ export function NovaCampanhaForm({ templates }: { templates: TemplateDTO[] }) {
   const [targetStatus, setTargetStatus] = useState<string>(LEAD_STATUS[0] ?? "");
   const [numerosTxt, setNumerosTxt] = useState("");
   const [templateId, setTemplateId] = useState(ativos[0]?.id ?? "");
-  const [delay, setDelay] = useState(2);
+  const [quando, setQuando] = useState<"agora" | "agendar">("agora");
+  const [data, setData] = useState("");
+  const [hora, setHora] = useState("");
   const [pending, startTransition] = useTransition();
-  const [result, setResult] = useState<{ ok: boolean; text: string } | null>(null);
+  const [erro, setErro] = useState("");
 
   const numeros = numerosTxt.split(/[\n,;]/).map((s) => s.trim()).filter(Boolean);
-  const podeEnviar = nome.trim() && templateId && (modo === "status" ? targetStatus : numeros.length > 0);
+  const destinoOk = modo === "status" ? Boolean(targetStatus) : numeros.length > 0;
+  const agendamentoOk = quando === "agora" || (data && hora);
+  const podeEnviar = nome.trim() && templateId && destinoOk && agendamentoOk;
 
   function enviar() {
-    setResult(null);
+    setErro("");
+    let scheduledFor: string | undefined;
+    if (quando === "agendar" && data && hora) {
+      scheduledFor = new Date(`${data}T${hora}`).toISOString();
+    }
     startTransition(async () => {
-      const res = await createAndSendCampaign({
+      const res = await scheduleCampaign({
         name: nome,
         templateId,
         targetStatus: modo === "status" ? targetStatus : undefined,
         manualPhones: modo === "numeros" ? numeros : undefined,
-        delaySeconds: delay,
+        scheduledFor,
       });
       if (res.ok) {
-        setResult({ ok: true, text: `Campanha enviada: ${res.data.sent} ok, ${res.data.failed} falha(s).` });
-        setNome("");
-        router.refresh();
+        // Vai direto para a tela de acompanhamento ao vivo.
+        router.push(`/admin/comunicacoes/campanhas/${res.data.campaignId}`);
       } else {
-        setResult({ ok: false, text: res.error });
+        setErro(res.error);
       }
     });
   }
@@ -54,75 +62,67 @@ export function NovaCampanhaForm({ templates }: { templates: TemplateDTO[] }) {
       />
 
       <div className="mb-3 grid grid-cols-2 gap-2">
-        <button
-          onClick={() => setModo("status")}
-          className={`rounded-md border px-3 py-2 text-sm ${modo === "status" ? "border-leather bg-cream font-medium text-leather" : "border-premium/20 text-leather/60"}`}
-        >
+        <button onClick={() => setModo("status")}
+          className={`rounded-md border px-3 py-2 text-sm ${modo === "status" ? "border-leather bg-cream font-medium text-leather" : "border-premium/20 text-leather/60"}`}>
           Por status do lead
         </button>
-        <button
-          onClick={() => setModo("numeros")}
-          className={`rounded-md border px-3 py-2 text-sm ${modo === "numeros" ? "border-leather bg-cream font-medium text-leather" : "border-premium/20 text-leather/60"}`}
-        >
+        <button onClick={() => setModo("numeros")}
+          className={`rounded-md border px-3 py-2 text-sm ${modo === "numeros" ? "border-leather bg-cream font-medium text-leather" : "border-premium/20 text-leather/60"}`}>
           Digitar números
         </button>
       </div>
 
       {modo === "status" ? (
-        <select
-          value={targetStatus}
-          onChange={(e) => setTargetStatus(e.target.value)}
-          className="mb-3 w-full rounded-md border border-premium/20 bg-cream px-3 py-2 text-sm"
-        >
+        <select value={targetStatus} onChange={(e) => setTargetStatus(e.target.value)}
+          className="mb-3 w-full rounded-md border border-premium/20 bg-cream px-3 py-2 text-sm">
           {LEAD_STATUS.map((s) => (
             <option key={s} value={s}>{LEAD_STATUS_LABEL[s] ?? s}</option>
           ))}
         </select>
       ) : (
         <>
-          <textarea
-            value={numerosTxt}
-            onChange={(e) => setNumerosTxt(e.target.value)}
-            rows={3}
+          <textarea value={numerosTxt} onChange={(e) => setNumerosTxt(e.target.value)} rows={3}
             placeholder={"5511999990000\n5521988881234"}
-            className="w-full rounded-md border border-premium/20 bg-cream px-3 py-2 text-sm"
-          />
+            className="w-full rounded-md border border-premium/20 bg-cream px-3 py-2 text-sm" />
           <p className="mb-3 mt-1 text-xs text-leather/60">{numeros.length} número(s) reconhecido(s)</p>
         </>
       )}
 
       <label className="block text-xs font-medium text-leather/70">Modelo</label>
-      <select
-        value={templateId}
-        onChange={(e) => setTemplateId(e.target.value)}
-        className="mt-1 mb-3 w-full rounded-md border border-premium/20 bg-cream px-3 py-2 text-sm"
-      >
+      <select value={templateId} onChange={(e) => setTemplateId(e.target.value)}
+        className="mt-1 mb-3 w-full rounded-md border border-premium/20 bg-cream px-3 py-2 text-sm">
         {ativos.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
       </select>
 
-      <label className="block text-xs font-medium text-leather/70">Intervalo entre envios: {delay}s</label>
-      <input
-        type="range" min={1} max={15} value={delay}
-        onChange={(e) => setDelay(Number(e.target.value))}
-        className="mb-3 w-full"
-      />
+      <div className="mb-3 grid grid-cols-2 gap-2">
+        <button onClick={() => setQuando("agora")}
+          className={`inline-flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm ${quando === "agora" ? "border-leather bg-cream font-medium text-leather" : "border-premium/20 text-leather/60"}`}>
+          <Send className="h-4 w-4" /> Enviar agora
+        </button>
+        <button onClick={() => setQuando("agendar")}
+          className={`inline-flex items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm ${quando === "agendar" ? "border-leather bg-cream font-medium text-leather" : "border-premium/20 text-leather/60"}`}>
+          <Calendar className="h-4 w-4" /> Agendar
+        </button>
+      </div>
 
-      {result && (
-        <div className={`mb-3 flex items-center gap-1.5 text-sm ${result.ok ? "text-emerald-700" : "text-burgundy"}`}>
-          {result.ok && <CheckCircle2 className="h-4 w-4" />} {result.text}
+      {quando === "agendar" && (
+        <div className="mb-3 grid grid-cols-2 gap-2">
+          <input type="date" value={data} onChange={(e) => setData(e.target.value)}
+            className="rounded-md border border-premium/20 bg-cream px-3 py-2 text-sm" />
+          <input type="time" value={hora} onChange={(e) => setHora(e.target.value)}
+            className="rounded-md border border-premium/20 bg-cream px-3 py-2 text-sm" />
         </div>
       )}
 
-      <button
-        onClick={enviar}
-        disabled={pending || !podeEnviar}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
-      >
+      {erro && <p className="mb-3 text-xs text-burgundy">{erro}</p>}
+
+      <button onClick={enviar} disabled={pending || !podeEnviar}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50">
         {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-        {pending ? "Enviando…" : "Criar e enviar"}
+        {pending ? "Preparando…" : quando === "agora" ? "Criar e enviar" : "Agendar campanha"}
       </button>
       <p className="mt-2 text-xs text-leather/50">
-        Dica: para listas grandes, envie em blocos. Veja a nota sobre fila/agendamento no manual.
+        Os envios são processados em fila pelo agendador (a cada minuto), sem travar o site — funciona para listas grandes.
       </p>
     </div>
   );
