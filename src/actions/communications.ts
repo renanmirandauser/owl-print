@@ -12,6 +12,29 @@ export type ActionResult<T = undefined> =
   | ({ ok: true } & (T extends undefined ? object : { data: T }))
   | { ok: false; error: string };
 
+/* ─── Tipos internos (formato "cru" vindo do .lean()) ──────── */
+
+type LeanTemplate = { _id: unknown; name: string; body: string; active?: boolean };
+type LeanClient = {
+  _id: unknown;
+  name?: string;
+  company?: string;
+  whatsapp?: string;
+  phone?: string;
+};
+type LeanCampaign = {
+  _id: unknown;
+  name?: string;
+  templateName?: string;
+  total?: number;
+  sent?: number;
+  delivered?: number;
+  read?: number;
+  failed?: number;
+  status?: string;
+  createdAt?: Date;
+};
+
 /* ─── Helpers ──────────────────────────────────────────────── */
 
 /** Substitui {{nome}}, {{empresa}}, {{numero}} no corpo do modelo. */
@@ -33,12 +56,12 @@ export interface TemplateDTO {
 
 export async function listTemplates(): Promise<TemplateDTO[]> {
   await dbConnect();
-  const docs = await Template.find().sort({ createdAt: -1 }).lean();
+  const docs = (await Template.find().sort({ createdAt: -1 }).lean()) as unknown as LeanTemplate[];
   return docs.map((t) => ({
-    id: String((t as { _id: unknown })._id),
-    name: (t as { name: string }).name,
-    body: (t as { body: string }).body,
-    active: (t as { active?: boolean }).active ?? true,
+    id: String(t._id),
+    name: t.name,
+    body: t.body,
+    active: t.active ?? true,
   }));
 }
 
@@ -68,29 +91,26 @@ export async function sendWhatsAppToClient(
   }
   try {
     await dbConnect();
-    const client = await Client.findById(clientId).lean();
+    const client = (await Client.findById(clientId).lean()) as unknown as LeanClient | null;
     if (!client) return { ok: false, error: "Cliente não encontrado." };
 
-    const c = client as { name?: string; company?: string; whatsapp?: string; phone?: string };
-    const destino = c.whatsapp || c.phone || "";
+    const destino = client.whatsapp || client.phone || "";
     if (!normalizarTelefone(destino)) {
       return { ok: false, error: "Este cliente não tem um WhatsApp válido cadastrado." };
     }
 
-    const tpl = await Template.findById(templateId).lean();
+    const tpl = (await Template.findById(templateId).lean()) as unknown as LeanTemplate | null;
     if (!tpl) return { ok: false, error: "Modelo não encontrado." };
-    const body = (tpl as { body: string }).body;
-    const templateName = (tpl as { name: string }).name;
 
-    const message = render(body, { nome: c.name, empresa: c.company, numero });
+    const message = render(tpl.body, { nome: client.name, empresa: client.company, numero });
     const result = await enviarTexto(destino, message);
 
     // Registra no log de comunicação.
     await CommunicationLog.create({
       clientId,
-      templateName,
+      templateName: tpl.name,
       phone: normalizarTelefone(destino),
-      contactName: c.name,
+      contactName: client.name,
       message,
       messageId: result.ok ? result.messageId : undefined,
       zaapId: result.ok ? result.zaapId : undefined,
@@ -104,8 +124,8 @@ export async function sendWhatsAppToClient(
         activities: {
           type: "whatsapp",
           content: result.ok
-            ? `Enviado modelo "${templateName}"`
-            : `Falha ao enviar "${templateName}": ${result.error}`,
+            ? `Enviado modelo "${tpl.name}"`
+            : `Falha ao enviar "${tpl.name}": ${result.error}`,
           at: new Date(),
         },
       },
@@ -124,12 +144,14 @@ export async function sendWhatsAppToClient(
 interface CampaignInput {
   name: string;
   templateId: string;
-  targetStatus?: string; // envia para clientes com este status de lead
-  manualPhones?: string[]; // OU lista de números avulsos
-  delaySeconds?: number; // atraso entre envios (1–15), recomendado 2–4
+  targetStatus?: string;
+  manualPhones?: string[];
+  delaySeconds?: number;
 }
 
-export async function createAndSendCampaign(input: CampaignInput): Promise<ActionResult<{ campaignId: string; sent: number; failed: number }>> {
+export async function createAndSendCampaign(
+  input: CampaignInput
+): Promise<ActionResult<{ campaignId: string; sent: number; failed: number }>> {
   if (!zapiConfigurado()) {
     return { ok: false, error: "Z-API não configurada. Preencha as variáveis ZAPI_* primeiro." };
   }
@@ -139,18 +161,16 @@ export async function createAndSendCampaign(input: CampaignInput): Promise<Actio
 
   try {
     await dbConnect();
-    const tpl = await Template.findById(input.templateId).lean();
+    const tpl = (await Template.findById(input.templateId).lean()) as unknown as LeanTemplate | null;
     if (!tpl) return { ok: false, error: "Modelo não encontrado." };
-    const body = (tpl as { body: string }).body;
-    const templateName = (tpl as { name: string }).name;
 
     // Monta a lista de destinatários.
     type Alvo = { id?: string; nome?: string; empresa?: string; phone: string };
     let alvos: Alvo[] = [];
 
     if (input.targetStatus) {
-      const clients = await Client.find({ status: input.targetStatus }).lean();
-      alvos = (clients as Array<{ _id: unknown; name?: string; company?: string; whatsapp?: string; phone?: string }>)
+      const clients = (await Client.find({ status: input.targetStatus }).lean()) as unknown as LeanClient[];
+      alvos = clients
         .map((c) => ({ id: String(c._id), nome: c.name, empresa: c.company, phone: c.whatsapp || c.phone || "" }))
         .filter((a) => normalizarTelefone(a.phone));
     } else if (input.manualPhones?.length) {
@@ -166,7 +186,7 @@ export async function createAndSendCampaign(input: CampaignInput): Promise<Actio
     const campaign = await Campaign.create({
       name: input.name.trim(),
       templateId: input.templateId,
-      templateName,
+      templateName: tpl.name,
       targetStatus: input.targetStatus,
       manualPhones: input.manualPhones,
       total: alvos.length,
@@ -175,16 +195,16 @@ export async function createAndSendCampaign(input: CampaignInput): Promise<Actio
 
     let sent = 0;
     let failed = 0;
-    const delay = input.delaySeconds && input.delaySeconds >= 1 && input.delaySeconds <= 15 ? input.delaySeconds : 2;
+    const delay =
+      input.delaySeconds && input.delaySeconds >= 1 && input.delaySeconds <= 15 ? input.delaySeconds : 2;
 
-    // Envia em sequência. (Para listas grandes, ver nota sobre fila/cron no manual.)
     for (const a of alvos) {
-      const message = render(body, { nome: a.nome, empresa: a.empresa });
+      const message = render(tpl.body, { nome: a.nome, empresa: a.empresa });
       const r = await enviarTexto(a.phone, message, delay);
       await CommunicationLog.create({
         clientId: a.id,
         campaignId: campaign._id,
-        templateName,
+        templateName: tpl.name,
         phone: normalizarTelefone(a.phone),
         contactName: a.nome,
         message,
@@ -227,17 +247,17 @@ export interface CampaignDTO {
 
 export async function listCampaigns(): Promise<CampaignDTO[]> {
   await dbConnect();
-  const docs = await Campaign.find().sort({ createdAt: -1 }).lean();
-  return (docs as Array<Record<string, unknown>>).map((c) => ({
+  const docs = (await Campaign.find().sort({ createdAt: -1 }).lean()) as unknown as LeanCampaign[];
+  return docs.map((c) => ({
     id: String(c._id),
-    name: String(c.name ?? ""),
-    templateName: String(c.templateName ?? ""),
-    total: Number(c.total ?? 0),
-    sent: Number(c.sent ?? 0),
-    delivered: Number(c.delivered ?? 0),
-    read: Number(c.read ?? 0),
-    failed: Number(c.failed ?? 0),
-    status: String(c.status ?? "draft"),
-    createdAt: c.createdAt ? new Date(c.createdAt as Date).toISOString() : null,
+    name: c.name ?? "",
+    templateName: c.templateName ?? "",
+    total: c.total ?? 0,
+    sent: c.sent ?? 0,
+    delivered: c.delivered ?? 0,
+    read: c.read ?? 0,
+    failed: c.failed ?? 0,
+    status: c.status ?? "draft",
+    createdAt: c.createdAt ? new Date(c.createdAt).toISOString() : null,
   }));
 }
