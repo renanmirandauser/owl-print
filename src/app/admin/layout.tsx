@@ -21,6 +21,7 @@ import {
   Menu,
   X,
   ExternalLink,
+  MessageSquare,
 } from "lucide-react";
 
 const GROUPS = [
@@ -30,6 +31,7 @@ const GROUPS = [
       { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
       { href: "/admin/orcamentos", label: "Orçamentos", icon: FileText },
       { href: "/admin/crm", label: "CRM", icon: Users },
+      { href: "/admin/comunicacoes", label: "Comunicações", icon: MessageSquare },
       { href: "/admin/briefings", label: "Briefings", icon: ClipboardList },
       { href: "/admin/producao", label: "Produção", icon: KanbanSquare },
       { href: "/admin/financeiro", label: "Financeiro", icon: Wallet },
