@@ -63,7 +63,9 @@ export default async function QuotesPage({
             <thead className="bg-cream/60 text-left text-xs uppercase tracking-wider text-leather/50">
               <tr>
                 <th className="px-4 py-3">Código</th>
+                <th className="px-4 py-3">OS Nº</th>
                 <th className="px-4 py-3">Cliente</th>
+                <th className="px-4 py-3">Vendedor</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3 text-right">Total</th>
                 <th className="px-4 py-3 text-right">Data</th>
@@ -77,7 +79,11 @@ export default async function QuotesPage({
                       #{q.code}
                     </Link>
                   </td>
+                  <td className="px-4 py-3 text-leather/70">
+                    {q.vendas?.nPedido ? `#${q.vendas.nPedido}` : "—"}
+                  </td>
                   <td className="px-4 py-3 text-leather">{q.clientName}</td>
+                  <td className="px-4 py-3 text-leather/70">{q.vendas?.vendedor || "—"}</td>
                   <td className="px-4 py-3">
                     <QuoteStatusBadge status={q.status} />
                   </td>

@@ -7,6 +7,8 @@ import { Quote } from "@/models/Quote";
 import { QUOTE_STATUS, type QuoteStatus } from "@/types";
 import { quoteSchema } from "@/lib/schemas";
 import { sendMail } from "@/lib/email";
+import { uploadImage } from "@/lib/cloudinary";
+import type { OsVendas } from "@/lib/vendas-options";
 
 export type QuoteInput = z.infer<typeof quoteSchema>;
 
@@ -30,6 +32,7 @@ export interface QuoteDTO {
   notes: string;
   validUntil: string | null;
   createdAt: string | null;
+  vendas: OsVendas | null; // OS do Sistema de Vendas OWL PRINT
 }
 
 type LeanQuote = {
@@ -44,6 +47,7 @@ type LeanQuote = {
   notes?: string;
   validUntil?: Date;
   createdAt?: Date;
+  vendas?: OsVendas;
 };
 
 function serialize(q: LeanQuote): QuoteDTO {
@@ -64,6 +68,7 @@ function serialize(q: LeanQuote): QuoteDTO {
     notes: q.notes ?? "",
     validUntil: q.validUntil ? new Date(q.validUntil).toISOString() : null,
     createdAt: q.createdAt ? new Date(q.createdAt).toISOString() : null,
+    vendas: q.vendas ? (JSON.parse(JSON.stringify(q.vendas)) as OsVendas) : null,
   };
 }
 
@@ -113,6 +118,7 @@ export async function createQuote(input: QuoteInput): Promise<ActionResult<{ id:
       status: "draft",
       validUntil: d.validUntil ? new Date(d.validUntil) : undefined,
       notes: d.notes,
+      vendas: d.vendas ?? undefined,
     });
     revalidatePath("/admin/orcamentos");
     return { ok: true, data: { id: String(quote._id) } };
@@ -139,6 +145,7 @@ export async function updateQuote(id: string, input: QuoteInput): Promise<Action
       items: d.items,
       validUntil: d.validUntil ? new Date(d.validUntil) : undefined,
       notes: d.notes,
+      vendas: d.vendas ?? undefined,
     });
     await quote.save(); // pre-save recalcula total
     revalidatePath(`/admin/orcamentos/${id}`);
@@ -177,6 +184,7 @@ export async function duplicateQuote(id: string): Promise<ActionResult<{ id: str
       items: src.items,
       status: "draft",
       notes: src.notes,
+      vendas: src.vendas ?? undefined, // copia a OS completa (Sistema de Vendas)
     });
     revalidatePath("/admin/orcamentos");
     return { ok: true, data: { id: String(copy._id) } };
@@ -256,5 +264,82 @@ export async function buildWhatsAppLink(id: string): Promise<ActionResult<{ url:
   } catch (err) {
     console.error("buildWhatsAppLink:", err);
     return { ok: false, error: "Erro ao gerar link." };
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SISTEMA DE VENDAS OWL PRINT — actions da OS
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ─── Upload de mockup (Cloudinary) ──────────────────────────
+   Substitui o "uploadMockup" do Google Apps Script do HTML.
+   Segurança: aceita apenas data-URLs de imagem (png/jpeg/webp),
+   com limite de ~4MB por arquivo e chave validada. */
+
+const MOCKUP_KEY_RE = /^(c|i|j|p|d)[12]$/;
+const DATAURL_RE = /^data:image\/(png|jpe?g|webp);base64,/i;
+const MAX_MOCKUP_BASE64 = 4.5 * 1024 * 1024; // ~4,5MB codificado
+
+export async function uploadOsMockup(
+  key: string,
+  dataUrl: string
+): Promise<ActionResult<{ key: string; url: string; publicId: string }>> {
+  if (!MOCKUP_KEY_RE.test(key)) return { ok: false, error: "Chave de mockup inválida." };
+  if (!DATAURL_RE.test(dataUrl)) return { ok: false, error: "Formato de imagem não permitido." };
+  if (dataUrl.length > MAX_MOCKUP_BASE64)
+    return { ok: false, error: "Imagem muito grande (máx. ~3MB). Reduza e tente novamente." };
+
+  try {
+    const up = await uploadImage(dataUrl, "owl-print/os-mockups");
+    return { ok: true, data: { key, url: up.url, publicId: up.publicId } };
+  } catch (err) {
+    console.error("uploadOsMockup:", err);
+    return { ok: false, error: "Erro ao enviar imagem." };
+  }
+}
+
+/* ─── Busca de histórico do cliente ──────────────────────────
+   Substitui (e melhora) o "buscarHistorico" do HTML: em vez de um
+   POST no-cors sem retorno, aqui a busca é real — retorna a última
+   OS salva para o mesmo nome de cliente, pronta para pré-preencher. */
+
+export async function getClientOsHistory(clientName: string): Promise<
+  ActionResult<{
+    found: boolean;
+    code?: string;
+    createdAt?: string;
+    vendas?: OsVendas;
+    items?: QuoteItemDTO[];
+  }>
+> {
+  const name = String(clientName ?? "").trim();
+  if (name.length < 2) return { ok: true, data: { found: false } };
+
+  try {
+    await dbConnect();
+    // Escapa caracteres de regex para busca segura por nome (case-insensitive)
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const doc = await Quote.findOne({
+      clientName: { $regex: `^${escaped}$`, $options: "i" },
+      vendas: { $exists: true },
+    })
+      .sort({ createdAt: -1 })
+      .lean<LeanQuote>();
+
+    if (!doc) return { ok: true, data: { found: false } };
+    const dto = serialize(doc);
+    return {
+      ok: true,
+      data: {
+        found: true,
+        code: dto.code,
+        createdAt: dto.createdAt ?? undefined,
+        vendas: dto.vendas ?? undefined,
+        items: dto.items,
+      },
+    };
+  } catch (err) {
+    console.error("getClientOsHistory:", err);
+    return { ok: false, error: "Erro ao buscar histórico." };
   }
 }

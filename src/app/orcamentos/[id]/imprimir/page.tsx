@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getQuote } from "@/actions/quotes";
 import { PrintButton } from "@/components/quotes/PrintButton";
+import { OsDetails } from "@/components/quotes/OsDetails";
 import { QUOTE_STATUS_LABEL } from "@/types";
 import { BRL } from "@/lib/utils";
 
@@ -71,35 +72,42 @@ export default async function QuotePrintPage({
           </div>
         </section>
 
-        {/* Itens */}
-        <table className="mt-8 w-full text-sm">
-          <thead>
-            <tr className="border-b border-leather/20 text-left text-xs uppercase tracking-wider text-leather/50">
-              <th className="py-2">Produto</th>
-              <th className="py-2 text-right">Qtd.</th>
-              <th className="py-2 text-right">Valor Unit.</th>
-              <th className="py-2 text-right">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {q.items.map((it, i) => (
-              <tr key={i} className="border-b border-leather/10">
-                <td className="py-3 text-leather">{it.name}</td>
-                <td className="py-3 text-right">{it.quantity}</td>
-                <td className="py-3 text-right">{BRL.format(it.unitPrice)}</td>
-                <td className="py-3 text-right font-medium">{BRL.format(it.subtotal)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {/* Itens / valores (só quando o orçamento tem preços) */}
+        {q.items.length > 0 && (
+          <>
+            <table className="mt-8 w-full text-sm">
+              <thead>
+                <tr className="border-b border-leather/20 text-left text-xs uppercase tracking-wider text-leather/50">
+                  <th className="py-2">Produto</th>
+                  <th className="py-2 text-right">Qtd.</th>
+                  <th className="py-2 text-right">Valor Unit.</th>
+                  <th className="py-2 text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {q.items.map((it, i) => (
+                  <tr key={i} className="border-b border-leather/10">
+                    <td className="py-3 text-leather">{it.name}</td>
+                    <td className="py-3 text-right">{it.quantity}</td>
+                    <td className="py-3 text-right">{BRL.format(it.unitPrice)}</td>
+                    <td className="py-3 text-right font-medium">{BRL.format(it.subtotal)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-        {/* Total */}
-        <div className="mt-6 flex justify-end">
-          <div className="w-56 border-t-2 border-champagne pt-3 text-right">
-            <p className="text-xs uppercase tracking-wider text-leather/50">Total</p>
-            <p className="font-display text-3xl text-leather">{BRL.format(q.total)}</p>
-          </div>
-        </div>
+            {/* Total */}
+            <div className="mt-6 flex justify-end">
+              <div className="w-56 border-t-2 border-champagne pt-3 text-right">
+                <p className="text-xs uppercase tracking-wider text-leather/50">Total</p>
+                <p className="font-display text-3xl text-leather">{BRL.format(q.total)}</p>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* OS do Sistema de Vendas (briefing e seções de produção) */}
+        {q.vendas && <OsDetails vendas={q.vendas} print />}
 
         {q.notes && (
           <section className="mt-8 rounded-lg bg-cream/60 p-4 text-sm print:bg-transparent print:p-0">

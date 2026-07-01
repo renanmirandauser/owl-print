@@ -84,6 +84,75 @@ const itemSchema = z.object({
   unitPrice: z.coerce.number().min(0, "Valor inválido"),
 });
 
+/* ─── Sistema de Vendas OWL PRINT (OS) — endurecido ──────────
+   Estrutura idêntica ao SISTEMA_DE_VENDAS_OWL_PRINT.html.
+   `detalhes` aceita apenas string→string com limites de tamanho
+   (proteção contra payloads maliciosos em Schema.Types.Mixed). */
+const isoDate = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida")
+  .optional()
+  .or(z.literal(""));
+
+const osMockupSchema = z.object({
+  key: z.string().regex(/^(c|i|j|p|d)[12]$/, "Chave de mockup inválida"),
+  url: z.string().url().max(500),
+  publicId: z.string().max(200).optional(),
+});
+
+export const vendasSchema = z.object({
+  modo: z.enum(["PROD", "CRIACAO", "ALTERACAO"]).default("PROD"),
+  nPedido: z.string().trim().max(20).optional(),
+  vendedor: z.string().trim().max(40).optional(),
+  entrega: z.string().trim().max(60).optional(),
+  prioridade: z.string().trim().max(20).optional(),
+  dtEntrada: isoDate,
+  dtLimite: isoDate,
+  inauguracao: isoDate,
+  secoes: z
+    .object({
+      cardapio: z.boolean().default(false),
+      impressao: z.boolean().default(false),
+      ja: z.boolean().default(false),
+      pc: z.boolean().default(false),
+      display: z.boolean().default(false),
+    })
+    .default({ cardapio: false, impressao: false, ja: false, pc: false, display: false }),
+  detalhes: z
+    .record(z.string().max(60), z.string().max(3000))
+    .default({})
+    .refine((d) => Object.keys(d).length <= 80, "Detalhes excedem o limite de campos"),
+  briefing: z
+    .object({
+      qtd: z.string().max(60).optional(),
+      formato: z.string().max(60).optional(),
+      modelo: z.string().max(60).optional(),
+      fixacao: z.string().max(60).optional(),
+      acab: z.string().max(60).optional(),
+      segmento: z.string().max(120).optional(),
+      template: z.string().max(3000).optional(),
+      fotos: z.string().max(60).optional(),
+      cores: z.string().max(60).optional(),
+      capa: z.string().max(60).optional(),
+      restricoes: z.string().max(3000).optional(),
+      tipo: z.string().max(40).optional(),
+      desc: z.string().max(3000).optional(),
+      driveLink: z.string().max(500).optional(),
+      acessorios: z
+        .object({
+          ja: z.boolean().optional(),
+          pc: z.boolean().optional(),
+          disp: z.boolean().optional(),
+          na: z.boolean().optional(),
+        })
+        .optional(),
+    })
+    .optional()
+    .nullable(),
+  mockups: z.array(osMockupSchema).max(10).default([]),
+  driveLink: z.string().max(500).optional(),
+});
+
 export const quoteSchema = z.object({
   clientName: z.string().min(2, "Informe o cliente"),
   clientId: z.string().optional(),
@@ -91,7 +160,9 @@ export const quoteSchema = z.object({
   clientEmail: z.string().email("E-mail inválido").optional().or(z.literal("")),
   validUntil: z.string().optional(), // ISO yyyy-mm-dd
   notes: z.string().optional(),
-  items: z.array(itemSchema).min(1, "Adicione ao menos 1 produto"),
+  // Valores agora são opcionais: a OS do Sistema de Vendas pode existir sem preço.
+  items: z.array(itemSchema).default([]),
+  vendas: vendasSchema.optional(),
 });
 
 /* Briefing — solicitação de criação enviada pelo cliente (site) */

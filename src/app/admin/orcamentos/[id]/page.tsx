@@ -4,6 +4,9 @@ import { ArrowLeft } from "lucide-react";
 import { getQuote } from "@/actions/quotes";
 import { QuoteStatusBadge } from "@/components/quotes/QuoteStatusBadge";
 import { QuoteActions } from "@/components/quotes/QuoteActions";
+import { OsDetails } from "@/components/quotes/OsDetails";
+import { OsPdfButton } from "@/components/quotes/OsPdfButton";
+import { OS_MODO_LABEL } from "@/lib/vendas-options";
 import { BRL } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -30,8 +33,17 @@ export default async function QuoteDetailPage({
         <div>
           <h1 className="font-display text-3xl text-leather">#{quote.code}</h1>
           <p className="text-leather/60">{quote.clientName}</p>
+          {quote.vendas && (
+            <p className="mt-0.5 text-xs font-semibold uppercase tracking-wider text-champagne">
+              Sistema de Vendas • {OS_MODO_LABEL[quote.vendas.modo]}
+              {quote.vendas.nPedido ? ` • OS #${quote.vendas.nPedido}` : ""}
+            </p>
+          )}
         </div>
-        <QuoteStatusBadge status={quote.status} />
+        <div className="flex items-center gap-2">
+          {quote.vendas && <OsPdfButton quote={quote} />}
+          <QuoteStatusBadge status={quote.status} />
+        </div>
       </div>
 
       {/* Meta */}
@@ -41,39 +53,44 @@ export default async function QuoteDetailPage({
         <Meta label="Contato" value={quote.clientPhone || quote.clientEmail || "—"} />
       </div>
 
-      {/* Itens */}
-      <div className="mt-4 overflow-hidden rounded-xl border border-premium/10 bg-white">
-        <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-sm">
-          <thead className="bg-cream/60 text-left text-xs uppercase tracking-wider text-leather/50">
-            <tr>
-              <th className="px-4 py-3">Produto</th>
-              <th className="px-4 py-3 text-right">Qtd.</th>
-              <th className="px-4 py-3 text-right">Valor Unit.</th>
-              <th className="px-4 py-3 text-right">Total</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-premium/10">
-            {quote.items.map((it, i) => (
-              <tr key={i}>
-                <td className="px-4 py-3 text-leather">{it.name}</td>
-                <td className="px-4 py-3 text-right">{it.quantity}</td>
-                <td className="px-4 py-3 text-right">{BRL.format(it.unitPrice)}</td>
-                <td className="px-4 py-3 text-right font-medium">{BRL.format(it.subtotal)}</td>
+      {/* OS do Sistema de Vendas (modo, briefing e seções de produção) */}
+      {quote.vendas && <OsDetails vendas={quote.vendas} />}
+
+      {/* Itens / valores (opcional quando a OS não tem preço) */}
+      {quote.items.length > 0 && (
+        <div className="mt-4 overflow-hidden rounded-xl border border-premium/10 bg-white">
+          <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-sm">
+            <thead className="bg-cream/60 text-left text-xs uppercase tracking-wider text-leather/50">
+              <tr>
+                <th className="px-4 py-3">Produto</th>
+                <th className="px-4 py-3 text-right">Qtd.</th>
+                <th className="px-4 py-3 text-right">Valor Unit.</th>
+                <th className="px-4 py-3 text-right">Total</th>
               </tr>
-            ))}
-          </tbody>
-          <tfoot>
-            <tr className="border-t border-premium/10">
-              <td colSpan={3} className="px-4 py-4 text-right font-display text-lg text-leather">
-                Total
-              </td>
-              <td className="px-4 py-4 text-right font-display text-2xl text-leather">
-                {BRL.format(quote.total)}
-              </td>
-            </tr>
-          </tfoot>
-        </table></div>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-premium/10">
+              {quote.items.map((it, i) => (
+                <tr key={i}>
+                  <td className="px-4 py-3 text-leather">{it.name}</td>
+                  <td className="px-4 py-3 text-right">{it.quantity}</td>
+                  <td className="px-4 py-3 text-right">{BRL.format(it.unitPrice)}</td>
+                  <td className="px-4 py-3 text-right font-medium">{BRL.format(it.subtotal)}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr className="border-t border-premium/10">
+                <td colSpan={3} className="px-4 py-4 text-right font-display text-lg text-leather">
+                  Total
+                </td>
+                <td className="px-4 py-4 text-right font-display text-2xl text-leather">
+                  {BRL.format(quote.total)}
+                </td>
+              </tr>
+            </tfoot>
+          </table></div>
+        </div>
+      )}
 
       {quote.notes && (
         <div className="mt-4 rounded-xl border border-premium/10 bg-white p-5">
