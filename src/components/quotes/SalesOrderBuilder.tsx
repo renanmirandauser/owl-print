@@ -1323,6 +1323,29 @@ function Field({
   );
 }
 
+function BriSel({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: string[];
+  onChange: (v: string) => void;
+}) {
+  return (
+    <Field label={label}>
+      <select className={inputCls} value={value} onChange={(e) => onChange(e.target.value)}>
+        <option value="">Selecione...</option>
+        {options.map((o) => (
+          <option key={o} value={o}>{o}</option>
+        ))}
+      </select>
+    </Field>
+  );
+}
+
 function Sel({
   label,
   k,
