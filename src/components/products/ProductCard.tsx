@@ -38,7 +38,7 @@ export function ProductCard({ slug, name, category, image, href }: ProductCardPr
             />
           ) : (
             <div className="flex h-full items-center justify-center text-4xl text-premium/40">
-              🦉
+              <Image src="/owl-whatsapp.png" alt="WhatsApp" fill sizes="100%" className="object-cover" />
             </div>
           )}
         </div>
