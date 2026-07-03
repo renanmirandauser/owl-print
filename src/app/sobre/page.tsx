@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { Navbar } from "@/components/site/Navbar";
 
 export const metadata: Metadata = {
@@ -35,17 +36,22 @@ export default function SobrePage() {
             em uma peça memorável, feita em couro, com acabamento sofisticado.
           </p>
           <p className="mt-4 text-leather/70">
-            Hoje atendemos restaurantes, bares, hotéis e motéis em todo o Brasil, entregando cardápios,
-            cartas de vinho, jogos americanos, porta-copos, porta-talheres, porta-contas e displays — sempre
+            Hoje atendemos restaurantes, bares, hotéis e motéis, cafeterias em todo o Brasil, entregando cardápios,
+            jogos americanos, porta-copos, porta-talheres e porta-contas — sempre
             personalizados e com excelência em cada detalhe.
           </p>
           <Link href="/contato" className="btn-gold mt-8">
             Solicitar Orçamento
           </Link>
         </div>
-        <div className="flex aspect-square items-center justify-center rounded-2xl bg-premium text-7xl text-champagne">
-          🦉
-        </div>
+        <Image
+          src="/images/owl-sobre-nos.jpg"
+          alt="OWL PRINT — Cardápios Personalizados"
+          width={900}
+          height={900}
+          priority
+          className="aspect-square w-full rounded-2xl object-cover shadow-premium"
+        />
       </section>
 
       <section className="bg-white py-16">
