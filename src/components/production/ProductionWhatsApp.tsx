@@ -5,7 +5,7 @@ import { ORDER_STAGE, ORDER_STAGE_LABEL } from "@/types";
 import type { OrderDTO } from "@/actions/orders";
 
 export function ProductionWhatsApp({ orders }: { orders: OrderDTO[] }) {
-  const phone = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
+  const phone = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "5511953098258";
 
   function build() {
     const lines: string[] = ["*Produção OWL PRINT*", ""];

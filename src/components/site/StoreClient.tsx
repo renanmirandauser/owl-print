@@ -19,7 +19,7 @@ const sel =
   "outline-none focus:border-champagne focus:ring-1 focus:ring-champagne/40 transition-colors";
 
 export function StoreClient({ items }: { items: Item[] }) {
-  const phone = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
+  const phone = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "5511953098258";
   /* carrinho = lista de linhas com id único */
   const [lines, setLines] = useState<(CartLine & { key: number })[]>([]);
   const [counter, setCounter] = useState(0);

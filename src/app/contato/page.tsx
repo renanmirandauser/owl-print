@@ -10,13 +10,20 @@ export const metadata: Metadata = {
   description: "Fale com a OWL PRINT e solicite seu orçamento.",
 };
 
-function Info({ icon, label, value }: { icon: string; label: string; value: string }) {
+function Info({ icon, label, value, href }: { icon: string; label: string; value: string; href?: string }) {
+  const content = href ? (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="text-sm text-leather underline-offset-2 hover:underline">
+      {value}
+    </a>
+  ) : (
+    <p className="text-sm text-leather">{value}</p>
+  );
   return (
     <div className="flex gap-3 border-b border-premium/10 py-3 last:border-0">
       <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-cream text-lg">{icon}</div>
       <div>
         <p className="text-xs uppercase tracking-wide text-leather/50">{label}</p>
-        <p className="text-sm text-leather">{value}</p>
+        {content}
       </div>
     </div>
   );
@@ -40,14 +47,18 @@ export default async function ContatoPage() {
         <div>
           <h2 className="font-display text-2xl text-leather">Informações</h2>
           <div className="mt-3 rounded-xl border border-premium/15 bg-white px-5 py-2 shadow-sm">
-            <Info icon="📍" label="Endereço" value="Rua das Oliveiras, 1234 — São Paulo, SP" />
-            <Info icon="📞" label="Telefone" value="(11) 4002-8922" />
-            <Info icon="💬" label="WhatsApp" value="(11) 98472-1130" />
+            <Info
+              icon="💬"
+              label="WhatsApp"
+              value="(11) 95309-8258"
+              href="https://wa.me/5511953098258?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20OWL%20PRINT%20e%20gostaria%20de%20um%20or%C3%A7amento."
+            />
+            <Info icon="📞" label="Telefone" value="(11) 95309-8258" href="tel:+5511953098258" />
             <Info icon="✉" label="E-mail" value="contato@owlprint.com.br" />
             <Info icon="🕐" label="Horário" value="Seg a Sex, 9h às 18h" />
           </div>
-          <div className="mt-4 flex h-44 items-center justify-center rounded-xl bg-premium text-sm tracking-widest text-champagne">
-            MAPA — SÃO PAULO, SP
+          <div className="mt-4 rounded-xl border border-premium/15 bg-cream px-5 py-4 text-sm text-leather/80">
+            🛒 Atendemos exclusivamente online — orçamentos, pedidos e entregas em toda a Grande São Paulo.
           </div>
         </div>
         <ContactForm segmentOptions={segments} />

@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
  */
 export function OwlWhatsApp() {
   const [open, setOpen] = useState(true);
-  const phone = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
+  const phone = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "5511953098258";
   const text = encodeURIComponent(
     "Olá! Vim pelo site da OWL PRINT e gostaria de um orçamento."
   );
