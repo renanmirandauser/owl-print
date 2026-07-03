@@ -52,8 +52,8 @@ export function Hero() {
           <Image
             src="/owl-sobre-nos.jpg"
             alt="Mascote OWL PRINT"
-            width={360}
-            height={444}
+            width={900}
+            height={900}
             priority
             className="h-[78%] w-auto drop-shadow-xl"
           />
