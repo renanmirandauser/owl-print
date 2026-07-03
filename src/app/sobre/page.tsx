@@ -45,7 +45,7 @@ export default function SobrePage() {
           </Link>
         </div>
         <Image
-          src="/images/owl-sobre-nos.png"
+          src="public/owl-sobre-nos.jpeg"
           alt="OWL PRINT — Cardápios Personalizados"
           width={900}
           height={900}
