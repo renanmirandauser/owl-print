@@ -50,10 +50,10 @@ export function Hero() {
         >
           <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-champagne/20" />
           <Image
-            src="/owl-sobre-nos.jpg"
+            src="/mascote-owl-print.png"
             alt="Mascote OWL PRINT"
-            width={900}
-            height={900}
+            width={360}
+            height={444}
             priority
             className="h-[78%] w-auto drop-shadow-xl"
           />
