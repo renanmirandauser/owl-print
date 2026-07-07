@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { MessageSquare, Phone, Mail, Tag, StickyNote, Send, Loader2 } from "lucide-react";
-import { addActivity, type ActivityDTO } from "@/actions/clients";
+import { MessageSquare, Phone, Mail, Tag, StickyNote, Send, Loader2, Trash2 } from "lucide-react";
+import { addActivity, removeActivity, type ActivityDTO } from "@/actions/clients";
 
 const ICONS: Record<string, typeof StickyNote> = {
   note: StickyNote,
@@ -17,6 +17,18 @@ export function ActivityTimeline({ id, activities }: { id: string; activities: A
   const router = useRouter();
   const [text, setText] = useState("");
   const [pending, startTransition] = useTransition();
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  function excluir(a: ActivityDTO) {
+    if (!confirm("Excluir este registro do histórico?")) return;
+    setDeleting(a.at + a.content);
+    startTransition(async () => {
+      const res = await removeActivity(id, a.at, a.content);
+      setDeleting(null);
+      if (res.ok) router.refresh();
+      else alert(res.error);
+    });
+  }
 
   function submit() {
     if (!text.trim()) return;
@@ -59,7 +71,21 @@ export function ActivityTimeline({ id, activities }: { id: string; activities: A
                 <span className="absolute -left-[26px] grid h-5 w-5 place-items-center rounded-full bg-cream ring-1 ring-premium/15">
                   <Icon className="h-3 w-3 text-premium" />
                 </span>
-                <p className="text-sm text-leather">{a.content}</p>
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-sm text-leather">{a.content}</p>
+                  <button
+                    onClick={() => excluir(a)}
+                    disabled={deleting === a.at + a.content}
+                    title="Excluir registro"
+                    className="shrink-0 rounded-md p-1 text-leather/30 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                  >
+                    {deleting === a.at + a.content ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-3.5 w-3.5" />
+                    )}
+                  </button>
+                </div>
                 <time className="text-xs text-leather/40">
                   {new Date(a.at).toLocaleString("pt-BR", {
                     day: "2-digit",

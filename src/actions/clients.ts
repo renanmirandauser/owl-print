@@ -193,6 +193,24 @@ export async function addActivity(
   }
 }
 
+export async function removeActivity(
+  id: string,
+  at: string,
+  content: string
+): Promise<ActionResult> {
+  try {
+    await dbConnect();
+    await Client.findByIdAndUpdate(id, {
+      $pull: { activities: { at: new Date(at), content } },
+    });
+    revalidatePath(`/admin/crm/${id}`);
+    return { ok: true };
+  } catch (err) {
+    console.error("removeActivity:", err);
+    return { ok: false, error: "Erro ao excluir registro do histórico." };
+  }
+}
+
 export async function deleteClient(id: string): Promise<ActionResult> {
   try {
     await dbConnect();
