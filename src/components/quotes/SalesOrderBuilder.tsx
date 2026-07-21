@@ -618,15 +618,37 @@ export function SalesOrderBuilder({
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Field label="Data Entrada">
-            <input type="date" className={inputCls} value={dtEntrada} readOnly />
-          </Field>
-          <Field label="Data Limite">
             <input
               type="date"
-              className={inputCls + " font-bold !text-burgundy"}
-              value={dtLimite}
-              readOnly
+              className={inputCls}
+              value={dtEntrada}
+              onChange={(e) => setDtEntrada(e.target.value)}
             />
+          </Field>
+          <Field label="Data Limite">
+            <div className="flex items-center gap-1">
+              <input
+                type="date"
+                className={inputCls + " font-bold !text-burgundy"}
+                value={dtLimite}
+                min={dtEntrada || undefined}
+                onChange={(e) => setDtLimite(e.target.value)}
+              />
+              <button
+                type="button"
+                title="Recalcular: entrada + 15 dias úteis"
+                onClick={() =>
+                  setDtLimite(
+                    toISODate(
+                      calcularDataLimite(dtEntrada ? new Date(`${dtEntrada}T12:00:00`) : new Date(), 15)
+                    )
+                  )
+                }
+                className="shrink-0 rounded-md border border-premium/20 bg-white px-2 py-2 text-xs text-leather transition-colors hover:border-champagne"
+              >
+                ↻
+              </button>
+            </div>
           </Field>
           <Field label="Nome Fantasia (Cliente)" span2>
             <input
