@@ -204,7 +204,7 @@ export async function gerarPdfOS(dados: OsPdfData): Promise<void> {
       reset();
     }
     fonte("normal", 6, GREY, 1.1);
-    doc.text("CARDÁPIOS • PLACEMATS • ACESSÓRIOS EM COURO SINTÉTICO", MARGIN, 74);
+    doc.text("CARDÁPIOS • JOGOS AMERICANOS • PORTA-CONTAS • PORTA-TALHERES", MARGIN, 74);
     reset();
 
     // bloco de identificação à direita
