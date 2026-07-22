@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 const WHATSAPP = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "5511953098258";
-const INSTAGRAM = "https://www.instagram.com/owlprint";
+const INSTAGRAM = "https://www.instagram.com/owlprintcardapios/";
 
 const UTM = "utm_source=instagram&utm_medium=bio&utm_campaign=links";
 
