@@ -3,6 +3,7 @@ import { Poppins, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@/components/analytics/Analytics";
 import { OwlWhatsApp } from "@/components/shared/OwlWhatsApp";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -38,6 +39,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" className={`${poppins.variable} ${jakarta.variable}`}>
+      <head>
+        <JsonLd />
+      </head>
       <body>
         {children}
         <OwlWhatsApp />
