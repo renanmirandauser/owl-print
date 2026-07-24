@@ -6,6 +6,7 @@ import { Plus, Trash2, Loader2, Check, MessageCircle, FileText } from "lucide-re
 import { createQuote, buildWhatsAppLink } from "@/actions/quotes";
 import type { ClientOption } from "@/actions/clients";
 import { BRL } from "@/lib/utils";
+import { SplashOwl } from "./SplashOwl";
 
 type Item = { key: string; name: string; quantity: number; unitPrice: number };
 
@@ -143,7 +144,9 @@ export function MobileQuoteClient({ clients, products, vendedor }: Props) {
 
   /* ─── Formulário ──────────────────────────────────── */
   return (
-    <div className="pb-44">
+    <>
+      <SplashOwl />
+      <div className="pb-44">
       {products.length > 0 && (
         <datalist id="mobile-product-options">
           {products.map((p) => (
@@ -337,6 +340,7 @@ export function MobileQuoteClient({ clients, products, vendedor }: Props) {
           {pending ? "Salvando…" : "Salvar orçamento"}
         </button>
       </footer>
-    </div>
+      </div>
+    </>
   );
 }
