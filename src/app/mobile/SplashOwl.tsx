@@ -3,19 +3,37 @@
 import { useEffect, useState } from "react";
 
 /**
- * Abertura animada: a coruja se revela de baixo pra cima sobre o azul da marca,
- * emendando com a splash nativa do app (mesmo fundo), e some com um fade.
+ * Abertura animada, emendada com a splash NATIVA do app.
  *
- * Para ajustar o ritmo, mexa só nestes três números (em milissegundos):
+ * Como funciona sem piscada e sem tela preta:
+ * - A splash nativa (azul) fica na tela e NÃO some sozinha
+ *   (launchAutoHide: false no capacitor.config.json).
+ * - Este componente aparece POR CIMA, no mesmo azul, e só então
+ *   manda a nativa sumir. Como o fundo é idêntico, a troca é invisível.
+ * - No fim, faz fade e desaparece, revelando a tela de orçamento.
+ *
+ * Ritmo — mexa só nestes números (em milissegundos):
  */
-const DURACAO_REVELACAO = 2600;     // quanto tempo a coruja leva pra se revelar
-const ESPERA_ANTES_DE_SAIR = 3400;  // quando começa o fade de saída
-const FADE = 800;                   // duração do fade
+const DURACAO_REVELACAO = 2400;     // a coruja se revelando de baixo pra cima
+const ESPERA_ANTES_DE_SAIR = 3200;  // tempo total antes do fade
+const FADE = 700;                   // duração do fade de saída
 
 export function SplashOwl() {
   const [fase, setFase] = useState<"entrando" | "saindo" | "fim">("entrando");
 
   useEffect(() => {
+    // Assim que a animação React está na tela, esconde a splash nativa.
+    // Import dinâmico: se o plugin não existir (ex.: rodando no navegador),
+    // simplesmente ignora, sem quebrar.
+    (async () => {
+      try {
+        const mod = await import("@capacitor/splash-screen");
+        await mod.SplashScreen.hide();
+      } catch {
+        /* fora do app (navegador) — não há splash nativa pra esconder */
+      }
+    })();
+
     const t1 = setTimeout(() => setFase("saindo"), ESPERA_ANTES_DE_SAIR);
     const t2 = setTimeout(() => setFase("fim"), ESPERA_ANTES_DE_SAIR + FADE);
     return () => {
